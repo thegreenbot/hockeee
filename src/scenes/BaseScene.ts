@@ -14,23 +14,48 @@ class BaseScene extends Phaser.Scene {
         this.playConfig = {
             currentPlayer: 'player1',
             currentSling: null,
-            players: 4,
-            player1: {
-                score: 0,
-                ammo: 5
-            },
-            player2: {
-                score: 0,
-                ammo: 5
-            },
-            player3: {
-                score: 0,
-                ammo: 5
-            },
-            player4: {
-                score: 0,
-                ammo: 5
-            }
+            players: [
+                {
+                    name: 'player1',
+                    score: 0,
+                    ammo: [],
+                    spriteFrame: 0,
+                    start: {
+                        x: 30,
+                        y: config.height - 30
+                    }
+                },
+                {
+                    name: 'player2',
+                    score: 0,
+                    ammo: [],
+                    spriteFrame: 12,
+                    start: {
+                        x: config.width - 30,
+                        y: 30
+                    }
+                },
+                {
+                    name: 'player3',
+                    score: 0,
+                    ammo: [],
+                    spriteFrame: 24,
+                    start: {
+                        x: config.width - 30,
+                        y: config.height - 30
+                    }
+                },
+                {
+                    name: 'player4',
+                    score: 0,
+                    ammo: [],
+                    spriteFrame: 36,
+                    start: {
+                        x: 30, 
+                        y: 30
+                    }
+                }
+            ]
         };
     }
 
@@ -42,8 +67,8 @@ class BaseScene extends Phaser.Scene {
         return this.playConfig;
     }
 
-    setPlayConfig(property: string, value: any) {
-        this.playConfig[property] = value;
+    setPlayConfig(config: object) {
+        this.playConfig = config;
     }
 
     preload(): void { }
