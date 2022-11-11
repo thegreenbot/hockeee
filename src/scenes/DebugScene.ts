@@ -13,8 +13,8 @@ export default class DebugScene extends BaseScene {
     super('DebugScene', config);
     this.sling1 = null;
     this.sling2 = null;
-    this.inactiveCategory= 0;
-    this.activeCategory= 0;
+    this.inactiveCategory = 0;
+    this.activeCategory = 0;
   }
 
   createBall(x: number, y: number, frame: number, player: string, index: number) {
@@ -27,23 +27,25 @@ export default class DebugScene extends BaseScene {
   }
 
   createBalls() {
-    const { players } = this.getPlayConfig();
+    const playConfig = this.getPlayConfig();
 
     const ammoCount = 5;
-    
-    players.forEach(player => {
-      let lastx = player.start.x;
+
+    Object.entries(playConfig.players).forEach((player) => {
+      let lastx = playConfig.players[player[0]].start.x;
       for (let index = 0; index < ammoCount; index++) {
-        const { start, spriteFrame, name} = player;
-        if (lastx <=200) {
-         lastx = lastx +40; 
+        const { start, spriteFrame, name } = playConfig.players[player[0]];
+        if (lastx <= 200) {
+          lastx = lastx + 40;
         } else {
-          lastx = lastx -40;
+          lastx = lastx - 40;
         }
-        const ball = this.createBall(lastx, start.y, spriteFrame, name, index+1)
-        player.ammo.push(ball);
+        const ball = this.createBall(lastx, start.y, spriteFrame, name, index + 1);
+        playConfig.players[player[0]].ammo.push(ball);
       }
-    })
+    });
+
+    this.setPlayConfig(playConfig);
   }
 
   createAnim(key: string, start: number, end: number) {
@@ -51,7 +53,7 @@ export default class DebugScene extends BaseScene {
       key: key,
       frames: this.anims.generateFrameNumbers('poke', {
         start: start,
-        end: end 
+        end: end
       },
       ),
       frameRate: 10,
@@ -61,13 +63,13 @@ export default class DebugScene extends BaseScene {
 
   createAnims() {
     const animConf = [
-      {key: 'player1', start: 0, end: 11},
-      {key: 'player2', start: 12, end: 23},
-      {key: 'player3', start: 24, end: 35},
-      {key: 'player4', start: 36, end: 47}
+      { key: 'player1', start: 0, end: 11 },
+      { key: 'player2', start: 12, end: 23 },
+      { key: 'player3', start: 24, end: 35 },
+      { key: 'player4', start: 36, end: 47 }
     ];
     animConf.forEach(anim => {
-      this.createAnim(anim.key, anim.start, anim.end) 
+      this.createAnim(anim.key, anim.start, anim.end)
     });
   }
 
@@ -92,38 +94,55 @@ export default class DebugScene extends BaseScene {
     // create container for sling
     // create sling, bind ball to it
     // set this.currentSling to the created sling
+    const CurrentPlayer = playConfig.players[playConfig.currentPlayer];
+
+    const rectangle = this.add.rectangle(config.width / 2, config.height, 300, 400, 0x00aaaa, 1);
 
     const ballA = this.matter.add.sprite(config.width / 2, 80, 'poke', 5, { restitution: 1, mass: 10, label: 'ballstart1' }).setCircle(26);
     const ballB = this.matter.add.sprite(config.width / 2, config.height - 80, 'poke', 3, { restitution: 0.4, mass: 10, label: 'ballstart1' }).setCircle(26);
     this.sling1 = createSling({
-      pointA: { x: config.width / 2, y: 80},
+      pointA: { x: config.width / 2, y: 80 },
       bodyB: ballA.body
     });
     this.sling2 = createSling({
-      pointA: { x: config.width / 2, y: config.height - 80},
+      pointA: { x: config.width / 2, y: config.height - 80 },
       bodyB: ballB.body
     });
   }
 
   preload() { }
 
+  getNextBall() {
+    const playConfig = this.getPlayConfig();
+    const ball = playConfig.players[playConfig.currentPlayer].ammo.pop();
+    this.setPlayConfig(playConfig);
+    return ball;
+  }
+
   startTurn() {
     // called immediately on game start
     // also called once balls stop moving
     // should call setNextPlayer();
     // should call createSling();
+    const config = this.getConfig();
     const playConfig = this.getPlayConfig();
     switch (playConfig.currentPlayer) {
       case 'player1' || 'player3':
-        // create sling
-
-        this.setPlayConfig('currentSling', this.sling1);
-        this.matter.world.add(this.sling1);
-        
+        // create sling in position 1
+        const posX = config.width/2;
+        const posY = config.height -200;
+        const ball = this.getNextBall();
+        ball.play(playConfig.currentPlayer);
+        ball.x = posX;
+        ball.y = posY;
+        const sling = createSling({
+          pointA: { x: posX, y: posY},
+          bodyB: ball.body
+        });
+        this.matter.world.add(sling);
         break;
       case 'player2' || 'player4':
-        this.setPlayConfig('currentSling', this.sling2);
-        this.matter.world.add(this.sling2);
+        // create sling in position 2
         break;
       default:
         break;
@@ -144,9 +163,27 @@ export default class DebugScene extends BaseScene {
     }, this);
   }
 
+  createGameGrid() {
+    const config = this.getConfig();
+
+    // background 1
+    const bg1 = this.add.image(0, 200, 'bg1');
+    bg1.flipY;
+    bg1.displayHeight = config.height / 2 - 200;
+    bg1.setOrigin(0, 0);
+
+    // background 2
+    const bg2 = this.add.image(0, config.height / 2, 'bg2');
+    bg2.displayHeight = config.height / 2 - 200;
+    bg2.setOrigin(0, 0);
+    const line = this.add.line(config.width / 2, config.height / 2, 0, 0, config.width, 0, 0x6666ff);
+    line.setLineWidth(10, 10);
+
+  }
+
   create(): void {
     this.createCollisionCategories();
-    this.createSling();
+    this.createGameGrid();
     this.createAnims();
     this.createBalls();
     this.createInputs();

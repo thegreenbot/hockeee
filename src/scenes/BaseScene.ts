@@ -14,8 +14,9 @@ class BaseScene extends Phaser.Scene {
         this.playConfig = {
             currentPlayer: 'player1',
             currentSling: null,
-            players: [
-                {
+            numPlayers: 4,
+            players: {
+                player1: {
                     name: 'player1',
                     score: 0,
                     ammo: [],
@@ -25,7 +26,7 @@ class BaseScene extends Phaser.Scene {
                         y: config.height - 30
                     }
                 },
-                {
+                player2: {
                     name: 'player2',
                     score: 0,
                     ammo: [],
@@ -35,7 +36,7 @@ class BaseScene extends Phaser.Scene {
                         y: 30
                     }
                 },
-                {
+                player3: {
                     name: 'player3',
                     score: 0,
                     ammo: [],
@@ -45,7 +46,7 @@ class BaseScene extends Phaser.Scene {
                         y: config.height - 30
                     }
                 },
-                {
+                player4: {
                     name: 'player4',
                     score: 0,
                     ammo: [],
@@ -55,7 +56,7 @@ class BaseScene extends Phaser.Scene {
                         y: 30
                     }
                 }
-            ]
+            }
         };
     }
 
