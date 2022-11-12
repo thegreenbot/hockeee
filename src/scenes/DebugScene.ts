@@ -8,6 +8,10 @@ export default class DebugScene extends BaseScene {
   private sling2: MatterJS.Constraint | null;
   public inactiveCategory: number;
   public activeCategory: number;
+  public player1Text: string;
+  public player2Text: string;
+  public player3Text: string;
+  public player4Text: string;
 
   constructor(config: object) {
     super('DebugScene', config);
@@ -15,6 +19,10 @@ export default class DebugScene extends BaseScene {
     this.sling2 = null;
     this.inactiveCategory = 0;
     this.activeCategory = 0;
+    this.player1Text = 'Player 1: 0';
+    this.player2Text = 'Player 2: 0';
+    this.player3Text = 'Player 3: 0';
+    this.player4Text = 'Player 4: 0';
   }
 
   createBall(x: number, y: number, frame: number, player: string, index: number) {
@@ -22,6 +30,7 @@ export default class DebugScene extends BaseScene {
     ball.setBounce(0.8)
     ball.setCircle(26);
     ball.setAlpha(0.2);
+    ball.setScale(0.5);
     ball.name = `${player}Ball-${index}`;
     return ball;
   }
@@ -129,14 +138,14 @@ export default class DebugScene extends BaseScene {
     switch (playConfig.currentPlayer) {
       case 'player1' || 'player3':
         // create sling in position 1
-        const posX = config.width/2;
-        const posY = config.height -200;
+        const posX = config.width / 2;
+        const posY = config.height - 200;
         const ball = this.getNextBall();
         ball.play(playConfig.currentPlayer);
         ball.x = posX;
         ball.y = posY;
         const sling = createSling({
-          pointA: { x: posX, y: posY},
+          pointA: { x: posX, y: posY },
           bodyB: ball.body
         });
         this.matter.world.add(sling);
@@ -155,7 +164,7 @@ export default class DebugScene extends BaseScene {
   }
 
   createInputs() {
-    this.input.on('dragend', function (pointer, gameObject) {
+    this.input.on('dragend', function(pointer, gameObject) {
       setTimeout(() => {
         const ref = this.sling1.bodyB;
         this.sling1.bodyB = null;
@@ -167,18 +176,37 @@ export default class DebugScene extends BaseScene {
     const config = this.getConfig();
 
     // background 1
-    const bg1 = this.add.image(0, 200, 'bg1');
+    const bg1 = this.add.image(0, 100, 'bg1');
     bg1.flipY;
-    bg1.displayHeight = config.height / 2 - 200;
+    bg1.displayHeight = config.height / 2 - 100;
     bg1.setOrigin(0, 0);
 
     // background 2
     const bg2 = this.add.image(0, config.height / 2, 'bg2');
-    bg2.displayHeight = config.height / 2 - 200;
+    bg2.displayHeight = config.height / 2 - 100;
     bg2.setOrigin(0, 0);
-    const line = this.add.line(config.width / 2, config.height / 2, 0, 0, config.width, 0, 0x6666ff);
-    line.setLineWidth(10, 10);
 
+    const centerLine = this.add.line(config.width / 2, config.height / 2, 0, 0, config.width, 0, 0x6666ff);
+    centerLine.setLineWidth(5, 5);
+
+    // top
+    this.add.line(0, 30, 0, 30, 200, 30, 0x6666ff).setOrigin(0, 0);
+    this.add.line(150, 30, 150, 30, config.width, 30, 0x6666ff).setOrigin(0, 0);
+    
+    // bottom
+    this.add.line(0, config.height- 30, 0, config.height -30, 200, config.height -30, 0x6666ff).setOrigin(0, 0).setDepth(100);
+    this.add.line(150, config.height - 30, 150, config.height -30, config.width, config.height - 30, 0x6666ff).setOrigin(0, 0).setDepth(100);
+
+    // rectangles 
+    this.add.rectangle(config.width / 2 - 50, 0, 100, 100, 0x6666ff).setOrigin(.5, 0);
+    this.add.rectangle(config.width / 2 - 50, config.height - 100, 100, 100, 0x6666ff).setOrigin(.5, 0);
+
+    // Player text
+    const p1t = this.add.text(195, 80, this.player1Text);
+    p1t.rotation = Math.PI;
+
+    const p2t = this.add.text(config.width - 105, 80, this.player2Text);
+    p2t.rotation = Math.PI;
   }
 
   create(): void {

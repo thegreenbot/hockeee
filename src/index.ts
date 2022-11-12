@@ -4,15 +4,15 @@ import PreloadScene from './scenes/PreloadScene';
 import { mobileAndTabletCheck } from './utils/utils';
 
 const scale = mobileAndTabletCheck()
- ? {
-     mode: Phaser.Scale.FIT,
-     autoCenter: Phaser.Scale.CENTER_BOTH,
-   }
- : { autoCenter: Phaser.Scale.CENTER_BOTH }
+  ? {
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+  }
+  : { autoCenter: Phaser.Scale.CENTER_BOTH }
 
 const SHARED_CONFIG = {
-  width: window.innerWidth - 40,
-  height: window.innerHeight - 40,
+  width: 600,
+  height: 800,
   maxVelocity: 50,
 }
 
