@@ -22,7 +22,7 @@ class BaseScene extends Phaser.Scene {
                     ammo: [],
                     spriteFrame: 0,
                     start: {
-                        x: 30,
+                        x: 0,
                         y: config.height - 30
                     }
                 },
@@ -32,7 +32,7 @@ class BaseScene extends Phaser.Scene {
                     ammo: [],
                     spriteFrame: 12,
                     start: {
-                        x: config.width - 30,
+                        x: config.width,
                         y: 30
                     }
                 },
@@ -42,7 +42,7 @@ class BaseScene extends Phaser.Scene {
                     ammo: [],
                     spriteFrame: 24,
                     start: {
-                        x: config.width - 30,
+                        x: config.width,
                         y: config.height - 30
                     }
                 },
@@ -52,7 +52,7 @@ class BaseScene extends Phaser.Scene {
                     ammo: [],
                     spriteFrame: 36,
                     start: {
-                        x: 30, 
+                        x: 0, 
                         y: 30
                     }
                 }

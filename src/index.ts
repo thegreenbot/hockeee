@@ -21,8 +21,8 @@ const Scenes = [PreloadScene, DebugScene];
 const initScenes = () => Scenes.map((scene) => new scene(SHARED_CONFIG));
 
 const config: Phaser.Types.Core.GameConfig = {
-  width: window.innerWidth - 60,
-  height: window.innerHeight - 40,
+  width: 600,
+  height: 800,
   pixelArt: true,
   parent: 'game',
   type: Phaser.AUTO,
