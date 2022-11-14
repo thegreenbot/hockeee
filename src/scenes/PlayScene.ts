@@ -1,13 +1,10 @@
 import Phaser from 'phaser';
-import { createSling } from '../gameObjects/sling';
 import BaseScene from './BaseScene';
 
 export default class PlayScene extends BaseScene {
 
   private sling: MatterJS.Constraint | null;
-  public inactiveGroup: number;
-  public activeGroup: number;
-  public activeCategory: number;
+ 
   public player1Text: string;
   public player2Text: string;
   public player3Text: string;
@@ -18,9 +15,7 @@ export default class PlayScene extends BaseScene {
   constructor(config: object) {
     super('PlayScene', config);
     this.sling = null;
-    this.inactiveGroup= 0;
-    this.activeGroup= 0;
-    this.activeCategory=0;
+    
     this.player1Text = 'Player 1: 0';
     this.player2Text = 'Player 2: 0';
     this.player3Text = 'Player 3: 0';
@@ -31,7 +26,6 @@ export default class PlayScene extends BaseScene {
 
   createBalls() {
     const playConfig = this.getPlayConfig();
-    // sean's comment
     const ammoCount = 5;
 
     Object.entries(playConfig.players).forEach((player) => {
@@ -44,7 +38,6 @@ export default class PlayScene extends BaseScene {
         } else {
           lastx = lastx - 30;
         }
-        ball.setCollisionGroup(this.inactiveGroup);
         playConfig.players[player[0]].ammo.push(ball);
       }
     });
@@ -99,19 +92,18 @@ export default class PlayScene extends BaseScene {
         const posX = config.width / 2;
         const posY = config.height - 70;
         const ball = this.getNextBall();
-        ball.setScale(1);
-        ball.setAlpha(1);
-        ball.setDepth(5);
+        ball.setScale(1).setAlpha(1).setDepth(10);
+        ball.setInteractive();
+        ball.setCollisionGroup(this.nonCollidingGroup);
+        this.input.setDraggable(ball);
+        // move ball into place
         ball.x = posX;
         ball.y = posY;
-        ball.setInteractive();
-        ball.setCollisionGroup(this.activeGroup);
-        this.input.setDraggable(ball);
-        const spr = this.matter.add.spring(
+        const spr = this.matter.add.constraint(
           this.bottomBar, 
           ball.body, 
           0, 
-          0.3, 
+          0.09,
           );
         this.sling = spr;
         break;
@@ -124,18 +116,22 @@ export default class PlayScene extends BaseScene {
   }
 
   createCollisionGroups() {
-    this.inactiveGroup= this.matter.world.nextGroup(true);
-    this.activeGroup= this.matter.world.nextGroup();
-    this.activeCategory = this.matter.world.nextCategory();
+    this.nonCollidingGroup= this.matter.world.nextGroup(true);
+    this.collidingGroup= this.matter.world.nextGroup();
+    this.collidingCategory= this.matter.world.nextCategory();
   }
 
   createInputs() {
     this.input.on('dragend', function(pointer, gameObject) {
+      console.log('dragend fired');
       setTimeout(() => {
-        const ref = this.sling.bodyB;
+        const ref: Phaser.Physics.Matter.Sprite = this.sling.bodyB;
         this.sling.bodyB = null;
-      }, 10);
-    this.matter.world.remove(this.sling);
+        this.input.setDraggable(gameObject, false);
+        gameObject.disableInteractive();
+        console.log(gameObject);
+        this.matter.world.remove(this.sling);
+      }, 50);
     }, this);
   }
 
@@ -173,10 +169,11 @@ export default class PlayScene extends BaseScene {
 
     this.matter.add.rectangle(config.width/2 - 100, 50, 5, 100, {isStatic: true});
     this.matter.add.rectangle(config.width/2 + 100, 50, 5, 100, {isStatic: true});
-    this.topBar = this.matter.add.rectangle(config.width/2, 100, 5, config.width, {angle: Math.PI/2, isStatic: true, isSensor: true});
+    this.topBar = this.matter.add.rectangle(config.width/2, 100, 5, config.width, {angle: Math.PI/2, isStatic: true, collisionFilter: {group: this.nonCollidingGroup}});
+
     this.matter.add.rectangle(config.width/2 - 100, config.height -50, 5, 100, {isStatic: true});
     this.matter.add.rectangle(config.width/2 + 100, config.height - 50, 5, 100, {isStatic: true});
-    this.bottomBar = this.matter.add.rectangle(config.width/2, config.height - 100, 5, config.width, {angle: Math.PI/2, isStatic: true, });
+    this.bottomBar = this.matter.add.rectangle(config.width/2, config.height - 100, 5, config.width, {angle: Math.PI/2, isStatic: true, collisionFilter: {group: this.nonCollidingGroup} });
 
     // rectangles 
     this.add.rectangle(config.width / 2, 50, 200, 100, 0x6666ff).setDepth(-1);
@@ -198,6 +195,7 @@ export default class PlayScene extends BaseScene {
     this.createBalls();
     this.createInputs();
     this.startTurn();
+
 
     this.matter.world.setBounds();
     this.matter.add.mouseSpring();

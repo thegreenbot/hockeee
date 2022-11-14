@@ -5,10 +5,16 @@ class BaseScene extends Phaser.Scene {
   private config: object;
 
   private playConfig: object;
+  public collidingGroup: number;
+  public nonCollidingGroup: number;
+  public collidingCategory: number;
 
   constructor(key: string, config: object) {
     super(key);
     this.config = config;
+    this.collidingGroup= 0;
+    this.nonCollidingGroup= 0;
+    this.collidingCategory=0;
 
     this.playConfig = {
       currentPlayer: 'player1',
@@ -76,7 +82,6 @@ class BaseScene extends Phaser.Scene {
       restitution: 0.8,
       circleRadius: 26,
       density: 10,
-      ignorePointer: true,
     }
     const ball = this.matter.add.sprite(x, y, 'poke', frame, matterBodyConfig);
     ball.setAlpha(0.5);
@@ -84,7 +89,6 @@ class BaseScene extends Phaser.Scene {
     ball.disableInteractive();
     ball.name = `${player}Ball-${index}`;
     return ball;
-
   };
   
   createAnim(key: string, start: number, end: number) {

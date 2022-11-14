@@ -12,7 +12,7 @@ class PreloadScene extends BaseScene {
     }
 
     create(): void {
-         this.scene.start('DebugScene');
+         this.scene.start('PlayScene');
     }
 }
 

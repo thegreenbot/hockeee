@@ -21,7 +21,7 @@ export default class DebugScene extends BaseScene {
     // ball passes through bar
     // 
 
-    var canCollide = function(filterA, filterB) {
+    const canCollide = function(filterA, filterB) {
       if (filterA.group === filterB.group && filterA.group !== 0)
         return filterA.group > 0;
 
@@ -41,12 +41,19 @@ export default class DebugScene extends BaseScene {
     for (i = total; i >= 1; i--) {
       const xpos = Math.random() * (40 - 560) + 560;
       const ypos = Math.random() * (20 - 260) + 260;
-      this.matter.add.circle(xpos, ypos, 10, { restitution: 0.8 });
+      const ball = this.matter.add.circle(xpos, ypos, 10, { restitution: 0.8, ignorePointer: true});
     }
 
-    this.matter.add.rectangle(300, 20, 600, 5, { isStatic: true });
-    this.matter.add.rectangle(300, 300, 600, 5, { isStatic: true });
+    const t = this.matter.add.rectangle(300, 20, 600, 5, { isStatic: true});
+    const b = this.matter.add.rectangle(300, 300, 600, 5, { isStatic: true, collisionFilter: {group: nonCollidingGroup} });
 
+    const hex = this.matter.add.polygon(300, 300, 6, 30, {collisionFilter: {group: nonCollidingGroup}});
+
+    this.matter.add.spring(hex, b, 0, 0.2);
+
+    this.input.on('dragend', function(gameobject, pointer) {
+      console.log('end');
+    });
     this.matter.world.setBounds();
     this.matter.add.mouseSpring();
 
