@@ -212,16 +212,17 @@ export default class PlayScene extends BaseScene {
   }
 
   checkIfPucksHaveStopped():boolean {
-    console.log('checking');
+    // for some reason this isn't detecting body speed. not sure why...
     let stopped = true;
     const {player1, player2, player3, player4} = this.playConfig.players;
     let allAmmo = [...player1.ammo, ...player2.ammo, ...player3.ammo, ...player4.ammo];
-    console.log(player1.ammo);
+    console.log(allAmmo);
     let shouldSkip = false;
     allAmmo.forEach((ammo: Phaser.Physics.Matter.Sprite) => {
       if (!stopped) {
         return;
       }
+      console.log(ammo.body.angularSpeed);
       if(ammo.body.angularSpeed != 0 && ammo.body.speed != 0) {
         stopped = false;;
       }
