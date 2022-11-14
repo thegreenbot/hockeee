@@ -31,7 +31,8 @@ const config: Phaser.Types.Core.GameConfig = {
     default: 'matter',
     matter: {
       debug: true,
-      gravity: false
+      gravity: false,
+      enableSleeping: true
     }
   },
   scene: initScenes()

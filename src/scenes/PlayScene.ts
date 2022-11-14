@@ -11,11 +11,13 @@ export default class PlayScene extends BaseScene {
   public player4Text: string;
   public topBar: any;
   public bottomBar: any;
+  public turnStarted: boolean;
 
   constructor(config: object) {
     super('PlayScene', config);
     this.sling = null;
     
+    this.turnStarted = false;
     this.player1Text = 'Player 1: 0';
     this.player2Text = 'Player 2: 0';
     this.player3Text = 'Player 3: 0';
@@ -33,10 +35,11 @@ export default class PlayScene extends BaseScene {
       for (let index = 0; index < ammoCount; index++) {
         const { start, spriteFrame, name } = playConfig.players[player[0]];
         const ball = this.createBall(lastx, start.y, spriteFrame, name, index + 1);
+        ball.setToSleep();
         if (lastx <= 200) {
-          lastx = lastx + 30;
+          lastx = lastx + 32;
         } else {
-          lastx = lastx - 30;
+          lastx = lastx - 32;
         }
         playConfig.players[player[0]].ammo.push(ball);
       }
@@ -83,22 +86,22 @@ export default class PlayScene extends BaseScene {
     // called immediately on game start
     // also called once balls stop moving
     // should call setNextPlayer();
-    // should call createSling();
     const config = this.getConfig();
     const playConfig = this.getPlayConfig();
+    let posX = config.width/2;
+    let posY = 0;
+    let ball = this.getNextBall();
+    ball.setScale(1).setAlpha(1).setDepth(10);
+    ball.setInteractive();
+    ball.setCollisionGroup(this.nonCollidingGroup);
+    this.input.setDraggable(ball);
+
     switch (playConfig.currentPlayer) {
       case 'player1' || 'player3':
         // create sling in position 1
-        const posX = config.width / 2;
-        const posY = config.height - 70;
-        const ball = this.getNextBall();
-        ball.setScale(1).setAlpha(1).setDepth(10);
-        ball.setInteractive();
-        ball.setCollisionGroup(this.nonCollidingGroup);
-        this.input.setDraggable(ball);
         // move ball into place
         ball.x = posX;
-        ball.y = posY;
+        ball.y = config.height - 70;
         const spr = this.matter.add.constraint(
           this.bottomBar, 
           ball.body, 
@@ -106,6 +109,7 @@ export default class PlayScene extends BaseScene {
           0.09,
           );
         this.sling = spr;
+        console.log(spr);
         break;
       case 'player2' || 'player4':
         // create sling in position 2
@@ -122,17 +126,22 @@ export default class PlayScene extends BaseScene {
   }
 
   createInputs() {
-    this.input.on('dragend', function(pointer, gameObject) {
+    this.input.on('dragend', function(pointer: any, gameObject: { disableInteractive: () => void; }) {
       console.log('dragend fired');
+      this.turnStarted = true;
       setTimeout(() => {
         const ref: Phaser.Physics.Matter.Sprite = this.sling.bodyB;
         this.sling.bodyB = null;
         this.input.setDraggable(gameObject, false);
         gameObject.disableInteractive();
-        console.log(gameObject);
         this.matter.world.remove(this.sling);
       }, 50);
     }, this);
+
+    this.matter.world.on('sleepstart', function(event: any, body: any) {
+      console.log('sleeping', body);
+    });
+
   }
 
   createGameGrid() {
@@ -202,7 +211,32 @@ export default class PlayScene extends BaseScene {
 
   }
 
-  update() {
-
+  checkIfPucksHaveStopped():boolean {
+    console.log('checking');
+    let stopped = true;
+    const {player1, player2, player3, player4} = this.playConfig.players;
+    let allAmmo = [...player1.ammo, ...player2.ammo, ...player3.ammo, ...player4.ammo];
+    console.log(player1.ammo);
+    let shouldSkip = false;
+    allAmmo.forEach((ammo: Phaser.Physics.Matter.Sprite) => {
+      if (!stopped) {
+        return;
+      }
+      if(ammo.body.angularSpeed != 0 && ammo.body.speed != 0) {
+        stopped = false;;
+      }
+    });
+    return stopped; 
   }
+
+  update(time: number, delta: number): void {
+    if (this.turnStarted) {
+      // fire off method to check speed of matter bodies.
+      if (this.checkIfPucksHaveStopped()) {
+        console.log('they stopped');
+        this.turnStarted = false;
+        // start next turn
+      }
+    }
+  } 
 }
