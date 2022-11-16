@@ -28,7 +28,7 @@ class BaseScene extends Phaser.Scene {
           spriteFrame: 0,
           start: {
             x: 20,
-            y: config.height - 30
+            y: config.height - 20
           }
         },
         player2: {
@@ -38,7 +38,7 @@ class BaseScene extends Phaser.Scene {
           spriteFrame: 12,
           start: {
             x: config.width - 20,
-            y: 30
+            y: 20
           }
         },
         player3: {
@@ -48,7 +48,7 @@ class BaseScene extends Phaser.Scene {
           spriteFrame: 24,
           start: {
             x: config.width - 20,
-            y: config.height - 30
+            y: config.height - 20
           }
         },
         player4: {
@@ -58,7 +58,7 @@ class BaseScene extends Phaser.Scene {
           spriteFrame: 36,
           start: {
             x: 20,
-            y: 30
+            y: 20
           }
         }
       }
@@ -82,6 +82,7 @@ class BaseScene extends Phaser.Scene {
       restitution: 0.8,
       circleRadius: 26,
       density: 10,
+      frictionAir: 0.03
     }
     const ball = this.matter.add.sprite(x, y, 'poke', frame, matterBodyConfig);
     ball.setAlpha(0.5);

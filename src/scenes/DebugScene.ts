@@ -30,6 +30,7 @@ export default class DebugScene extends BaseScene {
 
 
     const collidingCat = this.matter.world.nextCategory();
+    const nonCollidingCat = this.matter.world.nextCategory();
     const collidingGroup = this.matter.world.nextGroup();
     const nonCollidingGroup = this.matter.world.nextGroup(true);
 
@@ -38,24 +39,27 @@ export default class DebugScene extends BaseScene {
     let total = 50;
 
     const gen = new Phaser.Math.RandomDataGenerator();
-    for (i = total; i >= 1; i--) {
-      const xpos = Math.random() * (40 - 560) + 560;
-      const ypos = Math.random() * (20 - 260) + 260;
-      const ball = this.matter.add.circle(xpos, ypos, 10, { restitution: 0.8, ignorePointer: true});
-    }
+    // for (i = total; i >= 1; i--) {
+    //   const xpos = Math.random() * (40 - 560) + 560;
+    //   const ypos = Math.random() * (20 - 760) + 760;
+    //   const ball = this.matter.add.circle(xpos, ypos, 10, { restitution: 0.8, ignorePointer: true, collisionFilter: {group: nonCollidingGroup}});
+    // }
 
-    const t = this.matter.add.rectangle(300, 20, 600, 5, { isStatic: true});
-    const b = this.matter.add.rectangle(300, 300, 600, 5, { isStatic: true, collisionFilter: {group: nonCollidingGroup} });
+    const rect = this.matter.add.rectangle(320, 320, 10, 10, {isStatic: true, collisionFilter: {group: nonCollidingGroup}});
+    const hex = this.matter.add.polygon(300, 300, 6, 30, {collisionFilter: {group: nonCollidingGroup, category: nonCollidingCat}});
 
-    const hex = this.matter.add.polygon(300, 300, 6, 30, {collisionFilter: {group: nonCollidingGroup}});
+    const circ = this.matter.add.circle(500, 500, 20, {collisionFilter: {group: collidingGroup}})
+    // this.matter.add.spring(hex, rect, 0, 0.2);
 
-    this.matter.add.spring(hex, b, 0, 0.2);
-
-    this.input.on('dragend', function(gameobject, pointer) {
-      console.log('end');
-    });
+    // this.input.on('dragend', function(gameobject, pointer) {
+    //   console.log('end');
+    // });
     this.matter.world.setBounds();
     this.matter.add.mouseSpring();
+
+    console.log('rect vs hex', canCollide(rect.collisionFilter, hex.collisionFilter));
+    console.log('rect vs circ', canCollide(rect.collisionFilter, circ.collisionFilter));
+    console.log('hex vs circ', canCollide(hex.collisionFilter, circ.collisionFilter));
 
   }
 
