@@ -1,5 +1,5 @@
 {
-  "name": "partialscientificbacktick",
+  "name": "@thegreenbot/hockeee",
   "version": "1.0.0",
   "description": "",
   "source": "src/index.html",
@@ -13,7 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "parcel": "^2.7.0",
+    "parcel": "^2.8.0",
     "phaser": "^3.55.2"
   }
 }
