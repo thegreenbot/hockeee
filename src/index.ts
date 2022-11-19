@@ -23,7 +23,6 @@ const initScenes = () => Scenes.map((scene) => new scene(SHARED_CONFIG));
 
 const config: Phaser.Types.Core.GameConfig = {
   ...SHARED_CONFIG,
-  pixelArt: true,
   parent: 'game',
   type: Phaser.AUTO,
   scale: scale,

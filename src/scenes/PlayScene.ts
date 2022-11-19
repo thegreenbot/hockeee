@@ -25,20 +25,25 @@ export default class PlayScene extends BaseScene {
     this.bottomBar;
   }
 
-  assembleAmmo(player: string) {
+  assembleAmmo() {
     console.log('assembling');
     const playConfig = this.getPlayConfig();
     const config = this.getConfig();
-    let lastx = playConfig.players[player].start.x;
-    let posy = playConfig.players[player].start.y;
-    playConfig.players[player].ammo.forEach((ammo) => {
-      ammo.x = lastx;
-      ammo.posy;
-      if (lastx <= config.width / 2) {
-        lastx = lastx + 32;
-      } else {
-        lastx = lastx - 32;
-      }
+
+    Object.entries(playConfig.players).forEach((player) => {
+      const {ammo, start} = player[1];
+      let lastX = start.x;
+      ammo.forEach((ammoItem) => {
+        ammoItem.setCollisionGroup(this.nonCollidingGroup);
+        ammoItem.setAlpha(0.5);
+        ammoItem.setScale(0.5);
+        ammoItem.x = lastX;
+        if (lastX <= config.width /2) {
+          lastX = lastX + 32;
+        } else {
+          lastX = lastX -32;
+        }
+      });
     });
   }
 
@@ -59,10 +64,10 @@ export default class PlayScene extends BaseScene {
         ball.setData("belongsTo", name);
         ball.setCollisionGroup(this.nonCollidingGroup);
         playConfig.players[player[0]].ammo.push(ball);
-        this.assembleAmmo(player[0]);
       }
     });
 
+    this.assembleAmmo();
     this.setPlayConfig(playConfig);
   }
 
@@ -78,9 +83,54 @@ export default class PlayScene extends BaseScene {
     });
   }
 
-  setNextPlayer() {
+  hasAmmo(player: object) {
+    return player.ammo.length();
+  }
+
+  setNextPlayer(player: string = '') {
     const playConfig = this.getPlayConfig();
     // who is current player
+    const currentPlayer = (player != '') ? player : playConfig.currentPlayer;
+
+    switch(currentPlayer) {
+      case 'player1':
+        if (player) {
+          if (playConfig.players.player1.ammo.length() > 0) {
+            playConfig.currentPlayer = 'player1';
+          } 
+        } else {
+          this.setNextPlayer('player2');
+        }
+        break;
+      case 'player2':
+        if (player) {
+          if (playConfig.players.player2.ammo.length() > 0) {
+            playConfig.currentPlayer = 'player2';
+          } else {
+            this.setNextPlayer('player3');
+          }
+        }
+        break;
+      case 'player3':
+        if (player) {
+          if (playConfig.players.player3.ammo.length() > 0) {
+            playConfig.currentPlayer = 'player3';
+          } else {
+            this.setNextPlayer('player4');
+          }
+        }
+        break;
+      case 'player4':
+        if (player) {
+          if (playConfig.players.player4.ammo.length() > 0) {
+            playConfig.currentPlayer = 'player4';
+          } else {
+            this.setNextPlayer('player1');
+          }
+        }
+        break;
+    }
+    this.setPlayConfig(playConfig);
     // who is next in line index-wise, who still has ammo
     // that result should be set to this.currentPlayer.
     // if no ammo, tabulate score & display score with menu to restart
@@ -113,24 +163,22 @@ export default class PlayScene extends BaseScene {
     ball.setInteractive();
     ball.setCollisionGroup(this.nonCollidingGroup);
     this.input.setDraggable(ball);
+    const startRect = this.matter.add.rectangle(posX, posY, 5, 5, {isStatic: true, collisionFilter: {group: this.nonCollidingGroup}});
     switch (playConfig.currentPlayer) {
       case "player1" || "player3":
         // create sling in position 1
         // move ball into place
         ball.x = posX;
         ball.y = config.height - 70;
-        const startRect = this.matter.add.rectangle(
-          posX,
-          config.height - 70,
-          5,
-          5,
-          { isStatic: true, collisionFilter: { group: this.nonCollidingGroup } }
-        );
-        const spr = this.matter.add.constraint(startRect, ball.body, 0, 0.4);
-        this.sling = spr;
+        startRect.position = {x: config.width/2, y: config.height - 70};
+        this.sling = this.matter.add.constraint(startRect, ball.body, 0, 0.4);
         break;
       case "player2" || "player4":
         // create sling in position 2
+        ball.x = posX;
+        ball.y = 70;
+        startRect.position = {x: config.width/2, y: 70};
+        this.sling = this.matter.add.constraint(startRect, ball.body, 0, 0.4);
         break;
       default:
         break;
@@ -161,9 +209,16 @@ export default class PlayScene extends BaseScene {
       this
     );
 
-    this.matter.world.on("sleepstart", function (event: any, body: any) {
-      console.log("sleeping", body);
-    });
+    // collision start when pokeBalls hit
+    // decriment ball health/density
+
+    this.matter.world.on('collisionstart', function(event){
+      console.log("Evento: ", event)
+     var pairs = event.pairs;
+     console.log("Pair no visible: ", pairs)
+     console.log("Pair visible: ", pairs[0]);
+     console.log("colision between " + pairs[0].bodyA.label + " - " + pairs[0].bodyB.label);
+    })
   }
 
   createGameGrid() {
@@ -210,7 +265,16 @@ export default class PlayScene extends BaseScene {
 
 
     // player zones
-    this.matter.add.rectangle(0, 100, config.width/2, 100, {isStatic: true, collisionFilter: {group: this.nonCollidingGroup}})
+    // @TODO: this may not work as planned. it may be better to just detect puck position on playEnd. 
+    
+    const p4zone = this.add.zone(0, 0, config.width/2, 100).setRectangleDropZone(config.width/2, 100).setName('p4zone').setOrigin(0, 0);
+    const p3zone = this.add.zone(config.width/2, config.height-100, config.width/2, 100).setRectangleDropZone(config.width/2, 100).setName('p3zone').setOrigin(0, 0);
+    const p2zone = this.add.zone(config.width/2, 0, config.width/2, 100).setRectangleDropZone(config.width/2, 100).setName('p2zone').setOrigin(0, 0);
+    const p1zone = this.add.zone(0, config.height - 100, config.width/2, 100).setRectangleDropZone(config.width/2, 100).setName('p1zone').setOrigin(0, 0);
+
+    const topZone = this.add.zone(0, 100, config.width, config.height/2 -200).setRectangleDropZone(config.width, config.height/2 -200).setName('topZone').setOrigin(0, 0);
+    const bottomZone = this.add.zone(0, config.height/2, config.width, config.height/2 - 200).setRectangleDropZone(config.width, config.height/2 -200).setName('bottomZone').setOrigin(0, 0);
+  
   }
 
   create(): void {
@@ -235,7 +299,6 @@ export default class PlayScene extends BaseScene {
         return;
       }
       if (body.speed != 0 ) {
-        console.log(body.speed);
         stopped = false;
       }
     });
@@ -243,7 +306,6 @@ export default class PlayScene extends BaseScene {
   }
 
   cleanup(): void {
-    console.log('cleanup');
     const all = this.matter.world.getAllBodies();
     const config = this.getConfig();
     const playConfig = this.getPlayConfig();
@@ -256,14 +318,12 @@ export default class PlayScene extends BaseScene {
           if (body.gameObject.x < config.width / 2) {
             body.gameObject.setData("belongsTo", "player4");
             playConfig.players.player4.ammo.push(body.gameObject);
-            this.assembleAmmo("player4");
           }
 
           // is in p2 quadrant?
           if (body.gameObject.x > config.width / 2) {
             body.gameObject.setData("belongsTo", "player2");
             playConfig.players.player2.ammo.push(body.gameObject);
-            this.assembleAmmo("player2");
           }
         }
 
@@ -273,19 +333,21 @@ export default class PlayScene extends BaseScene {
           if (body.gameObject.x > config.width/2) {
             body.gameObject.setData("belongsTo", "player3");
             playConfig.players.player3.ammo.push(body.gameObject);
-            this.assembleAmmo("player3");
           }
           // is in p1 quadrant
           if (body.gameObject.x < config.width/2) {
             body.gameObject.setData("belongsTo", "player1");
             playConfig.players.player1.ammo.push(body.gameObject);
-            this.assembleAmmo("player1");
           }
         }
       }
 
       this.setPlayConfig(playConfig);
     });
+
+    this.assembleAmmo();
+    
+    this.startTurn();
   }
 
   update(time: number, delta: number): void {
