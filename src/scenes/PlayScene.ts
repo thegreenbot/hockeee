@@ -26,8 +26,7 @@ export default class PlayScene extends BaseScene {
   }
 
   assembleAmmo() {
-    console.log('assembling');
-    const playConfig = this.getPlayConfig();
+    let playConfig = this.getPlayConfig();
     const config = this.getConfig();
 
     Object.entries(playConfig.players).forEach((player) => {
@@ -171,14 +170,14 @@ export default class PlayScene extends BaseScene {
         ball.x = posX;
         ball.y = config.height - 70;
         startRect.position = {x: config.width/2, y: config.height - 70};
-        this.sling = this.matter.add.constraint(startRect, ball.body, 0, 0.4);
+        this.sling = this.matter.add.constraint(startRect, ball.body, 0, 0.1);
         break;
       case "player2" || "player4":
         // create sling in position 2
         ball.x = posX;
         ball.y = 70;
         startRect.position = {x: config.width/2, y: 70};
-        this.sling = this.matter.add.constraint(startRect, ball.body, 0, 0.4);
+        this.sling = this.matter.add.constraint(startRect, ball.body, 0, 0.1);
         break;
       default:
         break;
@@ -213,7 +212,6 @@ export default class PlayScene extends BaseScene {
     // decriment ball health/density
 
     this.matter.world.on('collisionstart', function(event){
-      console.log("Evento: ", event)
      var pairs = event.pairs;
      console.log("Pair no visible: ", pairs)
      console.log("Pair visible: ", pairs[0]);
@@ -354,7 +352,6 @@ export default class PlayScene extends BaseScene {
     if (this.turnStarted) {
       // fire off method to check speed of matter bodies.
       if (this.checkIfPucksHaveStopped()) {
-        console.log("they stopped");
         this.turnStarted = false;
         this.cleanup();
         // run cleanup

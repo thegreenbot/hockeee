@@ -1,16 +1,15 @@
 import Phaser from 'phaser';
-import BaseScene from './BaseScene';
+import BaseScene from '../BaseScene';
 
-export default class DebugScene extends BaseScene {
+export default class CollisionDebugScene extends BaseScene {
 
   constructor(config: object) {
-    super('DebugScene', config);
+    super('CollisionDebugScene', config);
   }
 
   preload() { }
 
   create(): void {
-
 
     // CHECK create 2 bars
     // create spring
@@ -33,7 +32,6 @@ export default class DebugScene extends BaseScene {
     const collidingGroup = this.matter.world.nextGroup();
     const nonCollidingGroup = this.matter.world.nextGroup(true);
 
-
     let i;
     let total = 50;
 
@@ -44,7 +42,7 @@ export default class DebugScene extends BaseScene {
     //   const ball = this.matter.add.circle(xpos, ypos, 10, { restitution: 0.8, ignorePointer: true, collisionFilter: {group: nonCollidingGroup}});
     // }
 
-    const rect = this.matter.add.rectangle(320, 320, 10, 10, {isStatic: true, collisionFilter: {group: nonCollidingGroup}});
+    const rect = this.matter.add.rectangle(320, 320, 20, 20, {isStatic: true, collisionFilter: {group: nonCollidingGroup}});
     const hex = this.matter.add.polygon(300, 300, 6, 30, {collisionFilter: {group: nonCollidingGroup, category: nonCollidingCat}});
 
     const circ = this.matter.add.circle(500, 500, 20, {collisionFilter: {group: collidingGroup}})

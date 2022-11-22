@@ -79,7 +79,7 @@ class BaseScene extends Phaser.Scene {
 
   createBall(x: number, y: number, frame: number, player: string, index: number): Phaser.Physics.Matter.Sprite {
     const matterBodyConfig: Phaser.Types.Physics.Matter.MatterBodyConfig = {
-      restitution: 0.8,
+      restitution: 1,
       circleRadius: 26,
       density: 10,
       frictionAir: 0.03
