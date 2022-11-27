@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import CollisionDebugScene from './scenes/debug/CollisionDebugScene';
+import TypesDebugScene from './scenes/debug/TypesDebugScene';
 import PreloadScene from './scenes/PreloadScene';
 import PlayScene from './scenes/PlayScene';
 import { mobileAndTabletCheck } from './utils/utils';
@@ -17,7 +18,7 @@ const SHARED_CONFIG = {
   maxVelocity: 50,
 }
 
-const Scenes = [PreloadScene, CollisionDebugScene, PlayScene];
+const Scenes = [PreloadScene, CollisionDebugScene, TypesDebugScene, PlayScene];
 
 const initScenes = () => Scenes.map((scene) => new scene(SHARED_CONFIG));
 

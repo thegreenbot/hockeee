@@ -8,6 +8,7 @@ class BaseScene extends Phaser.Scene {
   public collidingGroup: number;
   public nonCollidingGroup: number;
   public collidingCategory: number;
+  public noncollidingCategory: number;
 
   constructor(key: string, config: object) {
     super(key);
@@ -15,6 +16,7 @@ class BaseScene extends Phaser.Scene {
     this.collidingGroup= 0;
     this.nonCollidingGroup= 0;
     this.collidingCategory=0;
+    this.noncollidingCategory=0;
 
     this.playConfig = {
       currentPlayer: 'player1',
