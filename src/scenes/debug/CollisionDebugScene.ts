@@ -3,17 +3,36 @@ import BaseScene from '../BaseScene';
 
 export default class CollisionDebugScene extends BaseScene {
 
+
   constructor(config: object) {
     super('CollisionDebugScene', config);
   }
 
   preload() { }
 
+  hasCollided(pair: MatterJS.Pair): void {
+    const { bodyA, bodyB } = pair;
+    if (bodyA.label === "Polygon Body" && bodyB.label !== "Polygon Body") {
+      //  this.matter.setCollisionGroup([pair.bodyA], this.collidingGroup);
+      console.log('bodya is a polygon');
+      bodyA.collisionFilter = bodyB.collisionFilter;
+      bodyA.ignorePointer = true;
+      bodyA.label = "changed";
+    }
+    if (bodyB.label === "Polygon Body" && bodyA.label !== "Polygon Body") {
+      // this.matter.setCollisionGroup([pair.bodyB], this.collidingGroup);
+      console.log('bodyb is a polygon');
+      bodyB.collisionFilter = bodyA.collisionFilter;
+      bodyB.ignorePointer = true;
+      bodyB.label = "changed";
+    }
+  }
+
   create(): void {
 
     // CHECK create 2 bars
     // create spring
-    // CHECK lace many balls in scene
+    // CHECK place many balls in scene
     // CHECK balls are able to collide with each other & bars
     // spring ball is able to collide with balls but NOT bar
     // ball passes through bar
@@ -27,36 +46,26 @@ export default class CollisionDebugScene extends BaseScene {
     };
 
 
-    const collidingCat = this.matter.world.nextCategory();
-    const nonCollidingCat = this.matter.world.nextCategory();
-    const collidingGroup = this.matter.world.nextGroup();
-    const nonCollidingGroup = this.matter.world.nextGroup(true);
+    this.collidingCategory = this.matter.world.nextCategory();
+    this.noncollidingCategory = this.matter.world.nextCategory();
+    this.collidingGroup = this.matter.world.nextGroup();
+    this.nonCollidingGroup = this.matter.world.nextGroup(true);
 
+
+    // put stuff on board
     let i;
-    let total = 50;
+    let last = 60
+    for ( i = 8; i >= 1; i--) {
+      this.matter.add.rectangle(last, 320, 50, 50, {isStatic: true, restitution: 1, collisionFilter: {group: this.nonCollidingGroup}, render: {fillColor: 0x000fff}, ignorePointer: true});
+      this.matter.add.polygon(last, 150, 6, 30, {restitution: 1, collisionFilter: {group: this.nonCollidingGroup, category: this.noncollidingCategory}, render: {fillColor: 0xff0000}, onCollideCallback: this.hasCollided});
+      this.matter.add.circle(last, 500, 20, { restitution: 1, collisionFilter: {group: this.collidingGroup}, render: {fillColor: 0x775544}, ignorePointer: true});
 
-    const gen = new Phaser.Math.RandomDataGenerator();
-    // for (i = total; i >= 1; i--) {
-    //   const xpos = Math.random() * (40 - 560) + 560;
-    //   const ypos = Math.random() * (20 - 760) + 760;
-    //   const ball = this.matter.add.circle(xpos, ypos, 10, { restitution: 0.8, ignorePointer: true, collisionFilter: {group: nonCollidingGroup}});
-    // }
+      last = last + 70;
+    }
 
-    const rect = this.matter.add.rectangle(320, 320, 20, 20, {isStatic: true, collisionFilter: {group: nonCollidingGroup}});
-    const hex = this.matter.add.polygon(300, 300, 6, 30, {collisionFilter: {group: nonCollidingGroup, category: nonCollidingCat}});
-
-    const circ = this.matter.add.circle(500, 500, 20, {collisionFilter: {group: collidingGroup}})
-    // this.matter.add.spring(hex, rect, 0, 0.2);
-
-    // this.input.on('dragend', function(gameobject, pointer) {
-    //   console.log('end');
-    // });
     this.matter.world.setBounds();
     this.matter.add.mouseSpring();
 
-    console.log('rect vs hex', canCollide(rect.collisionFilter, hex.collisionFilter));
-    console.log('rect vs circ', canCollide(rect.collisionFilter, circ.collisionFilter));
-    console.log('hex vs circ', canCollide(hex.collisionFilter, circ.collisionFilter));
 
   }
 
