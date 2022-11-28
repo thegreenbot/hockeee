@@ -1,72 +1,104 @@
 import BaseScene from "../BaseScene";
 
 export default class ScoreDebugScene extends BaseScene {
-  public scoreCounter: number;
+  public circleScoreCounter: number = 0;
+  public squareScoreCounter: number = 0;
 
-  public scoreText: any;
-  
+  public circleScoreText: any;
+  public squareScoreText: any;
+
   constructor(config: object) {
     super("ScoreDebugScene", config);
-    this.scoreCounter = 0;
   }
 
-  setScoreCounter(newScore: number) {
-    this.scoreCounter = newScore;
+  setCircleScoreCounter(newScore: number) {
+    this.circleScoreCounter = newScore;
   }
 
-  getScoreCounter() {
-    return this.scoreCounter;
+  getCircleScoreCounter() {
+    return this.circleScoreCounter;
   }
 
-  preload(): void {
-    // this.collidingCategory = this.matter.world.nextCategory();
-    // this.noncollidingCategory = this.matter.world.nextCategory();
-    // this.collidingGroup = this.matter.world.nextGroup();
-    // this.nonCollidingGroup = this.matter.world.nextGroup(true);
+  setSquareScoreCounter(newScore: number) {
+    this.squareScoreCounter = newScore;
   }
+
+  getSquareScoreCounter() {
+    return this.squareScoreCounter;
+  }
+
+  preload(): void {}
 
   create(): void {
-
+    const { width, height } = this.getConfig();
 
     // create sensor
-    
-    const goal = this.matter.add.rectangle(10, 10, 300, 300, {isSensor: true, isStatic: true, render: {strokeStyle: 'red', fillStyle: 'blue', lineWidth: 1}})
 
+    const circlegoal = this.matter.add.rectangle(
+      width / 4,
+      150,
+      width / 2,
+      300,
+      { isSensor: true, isStatic: true, label: "circlegoal" }
+    );
+    const squareGoal = this.matter.add.rectangle(
+      (width / 4) * 3,
+      150,
+      width / 2,
+      300,
+      { isSensor: true, isStatic: true, label: "squaregoal" }
+    );
 
     // create pucks
     let i;
     let last = 30;
-    let circles = [];
-    let rectangles = []
-    for (i =0; i <= 4; i++) {
-        const circle = this.matter.add.circle(last + 400, 500, 15, {restitution: 1 });
-        circles.push(circle);
-        const rect = this.matter.add.rectangle(last, 500, 30, 30, {restitution: 1});
-        rectangles.push(rect);
-        last = last + 30;
+    let items = [];
+    for (i = 0; i <= 4; i++) {
+      const circle = this.matter.add.circle(last + 400, 500, 15, {
+        restitution: 1,
+      });
+      items.push(circle);
+      const rect = this.matter.add.rectangle(last, 500, 30, 30, {
+        restitution: 1,
+      });
+      items.push(rect);
+      last = last + 30;
     }
 
     this.matterCollision.addOnCollideStart({
-        objectA: goal,
-        objectB: circles,
-        callback: eventData => {
-            const currentScore = this.getScoreCounter();
-            this.setScoreCounter(currentScore + 1);
-            this.scoreText.setText(`Circles in Goal: ${this.getScoreCounter()}`);
+      objectA: [circlegoal, squareGoal],
+      objectB: items,
+      callback: (eventData) => {
+        const { bodyA, bodyB } = eventData;
+        if (bodyA.label === "circlegoal" && bodyB.label === "Circle Body") {
+          const currentCircleScore = this.getCircleScoreCounter();
+          this.setCircleScoreCounter(currentCircleScore + 1);
+          this.circleScoreText.setText(
+            `Circles in Goal: ${this.getCircleScoreCounter()}`
+          );
+        } else if (
+          bodyA.label === "squaregoal" &&
+          bodyB.label === "Rectangle Body"
+        ) {
+          const currentSquareScore = this.getSquareScoreCounter();
+          this.setSquareScoreCounter(currentSquareScore + 1);
+          this.squareScoreText.setText(
+            `Squares in Goal: ${this.getSquareScoreCounter()}`
+          );
         }
+      },
     });
 
-    this.matterCollision.addOnCollideEnd({
-        objectA: goal,
-        objectB: circles,
-        callback: eventData => {
-            const currentScore = this.getScoreCounter();
-            this.setScoreCounter(currentScore - 1);
-            this.scoreText.setText(`Circles in Goal: ${this.getScoreCounter()}`);
-        }
-    });
-
-    this.scoreText = this.add.text(300, 50, `Circles in Goal: ${this.getScoreCounter()}`);
+    this.circleScoreText = this.add.text(
+      20,
+      50,
+      `Circles in Goal: ${this.getCircleScoreCounter()}`
+    );
+    this.squareScoreText = this.add.text(
+      width / 2 + 20,
+      50,
+      `Squares in Goal: ${this.getSquareScoreCounter()}`
+    );
 
     this.matter.world.setBounds();
     this.matter.add.mouseSpring();
