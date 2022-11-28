@@ -10,10 +10,11 @@ class PreloadScene extends BaseScene {
         this.load.atlas('flares', 'flares.png', 'flares.json');
         this.load.image('bg1', 'bg1/sky.png');
         this.load.image('bg2', 'bg2/sky.png');
+        this.load.image('bg3', 'bg3/sky.png');
     }
 
     create(): void {
-         this.scene.start('ScoreDebugScene');
+         this.scene.start('BallAnimationScene');
     }
 }
 

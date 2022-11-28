@@ -232,12 +232,10 @@ export default class PlayScene extends BaseScene {
     bg1.setStatic(true);
 
     // background 2
-    const bg2 = this.matter.add.image(0, config.height / 2, "bg2");
+    const bg2 = this.matter.add.image(0, config.height / 2, "bg2", undefined, {isSensor: true, isStatic: true});
     bg2.displayHeight = config.height / 2 - 100;
     bg2.setDepth(1);
     bg2.setOrigin(0, 0);
-    bg2.setSensor(true);
-    bg2.setStatic(true);
 
     const centerLine = this.add.line(
       config.width / 2,

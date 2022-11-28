@@ -6,6 +6,7 @@ import PlayScene from './scenes/PlayScene';
 import { mobileAndTabletCheck } from './utils/utils';
 import ScoreDebugScene from './scenes/debug/ScoreDebugScene';
 import PhaserMatterCollisionPlugin from 'phaser-matter-collision-plugin';
+import BallAnimationScene from './scenes/debug/BallAnimationScene';
 
 const scale = mobileAndTabletCheck()
   ? {
@@ -20,7 +21,7 @@ const SHARED_CONFIG = {
   maxVelocity: 50,
 }
 
-const Scenes = [PreloadScene, CollisionDebugScene, TypesDebugScene, ScoreDebugScene, PlayScene];
+const Scenes = [PreloadScene, CollisionDebugScene, TypesDebugScene, ScoreDebugScene, BallAnimationScene, PlayScene];
 
 const initScenes = () => Scenes.map((scene) => new scene(SHARED_CONFIG));
 

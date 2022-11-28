@@ -32,33 +32,37 @@ export default class ScoreDebugScene extends BaseScene {
   create(): void {
     const { width, height } = this.getConfig();
 
-    // create sensor
+    // create sensors
+    const circlegoal = this.matter.add
+      .image(width/2, height/2 - 150, "bg1", undefined, {
+        isSensor: true,
+        isStatic: true,
+        label: "circlegoal",
+      });
+    circlegoal.displayHeight = height / 2 - 100;
+    circlegoal.displayWidth = width;
+    circlegoal.setDepth(0);
 
-    const circlegoal = this.matter.add.rectangle(
-      width / 4,
-      150,
-      width / 2,
-      300,
-      { isSensor: true, isStatic: true, label: "circlegoal" }
-    );
-    const squareGoal = this.matter.add.rectangle(
-      (width / 4) * 3,
-      150,
-      width / 2,
-      300,
-      { isSensor: true, isStatic: true, label: "squaregoal" }
-    );
+    const squareGoal = this.matter.add
+      .image(width/2, height/2 + 150, "bg3", undefined, {
+        isSensor: true,
+        isStatic: true,
+        label: "squaregoal",
+      });
+    squareGoal.displayHeight = height / 2 - 100;
+    squareGoal.displayWidth = width;
+    squareGoal.setDepth(0);
 
     // create pucks
     let i;
-    let last = 30;
+    let last = 250;
     let items = [];
     for (i = 0; i <= 4; i++) {
-      const circle = this.matter.add.circle(last + 400, 500, 15, {
+      const circle = this.matter.add.circle(last, height - 75, 15, {
         restitution: 1,
       });
       items.push(circle);
-      const rect = this.matter.add.rectangle(last, 500, 30, 30, {
+      const rect = this.matter.add.rectangle(last, 75, 30, 30, {
         restitution: 1,
       });
       items.push(rect);
@@ -89,14 +93,38 @@ export default class ScoreDebugScene extends BaseScene {
       },
     });
 
+    this.matterCollision.addOnCollideEnd({
+      objectA: [circlegoal, squareGoal],
+      objectB: items,
+      callback: (eventData) => {
+        const { bodyA, bodyB } = eventData;
+        // do nothing if the item is simply still
+        if (bodyB.speed !== 0) {
+          if (bodyA.label === "squaregoal" && bodyB.label === "Rectangle Body") {
+            const currentSquareScore = this.getSquareScoreCounter();
+            this.setSquareScoreCounter(currentSquareScore - 1);
+            this.squareScoreText.setText(
+              `Squares in Goal: ${this.getSquareScoreCounter()}`
+            )
+          } else if (bodyA.label === "circlegoal" && bodyB.label === "Circle Body") {
+            const currentCircleScore = this.getCircleScoreCounter();
+            this.setCircleScoreCounter(currentCircleScore - 1);
+            this.circleScoreText.setText(
+              `Circles in Goal: ${this.getCircleScoreCounter()}`
+            )
+          }
+        }
+      }
+    });
+
     this.circleScoreText = this.add.text(
+      200,
       20,
-      50,
       `Circles in Goal: ${this.getCircleScoreCounter()}`
     );
     this.squareScoreText = this.add.text(
-      width / 2 + 20,
-      50,
+      200,
+      height - 20,
       `Squares in Goal: ${this.getSquareScoreCounter()}`
     );
 

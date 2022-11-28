@@ -30,14 +30,6 @@ export default class CollisionDebugScene extends BaseScene {
 
   create(): void {
 
-    // CHECK create 2 bars
-    // create spring
-    // CHECK place many balls in scene
-    // CHECK balls are able to collide with each other & bars
-    // spring ball is able to collide with balls but NOT bar
-    // ball passes through bar
-    // 
-
     const canCollide = function(filterA, filterB) {
       if (filterA.group === filterB.group && filterA.group !== 0)
         return filterA.group > 0;
@@ -50,7 +42,6 @@ export default class CollisionDebugScene extends BaseScene {
     this.noncollidingCategory = this.matter.world.nextCategory();
     this.collidingGroup = this.matter.world.nextGroup();
     this.nonCollidingGroup = this.matter.world.nextGroup(true);
-
 
     // put stuff on board
     let i;
