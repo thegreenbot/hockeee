@@ -66,6 +66,8 @@ export default class CollisionDebugScene extends BaseScene {
     this.matter.world.setBounds();
     this.matter.add.mouseSpring();
 
+    
+
 
   }
 

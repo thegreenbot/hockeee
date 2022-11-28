@@ -13,7 +13,7 @@ class PreloadScene extends BaseScene {
     }
 
     create(): void {
-         this.scene.start('CollisionDebugScene');
+         this.scene.start('ScoreDebugScene');
     }
 }
 

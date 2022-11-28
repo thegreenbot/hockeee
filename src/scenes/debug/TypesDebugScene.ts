@@ -1,5 +1,7 @@
 import BaseScene from "../BaseScene";
 
+// @TODO: interact with objects. possibly store states of 'clickmetext'?
+
 export default class TypesDebugScene extends BaseScene{
   public textString: string;
   public numberPlaceholder: number;
