@@ -8,7 +8,7 @@ export default class ScoreDebugScene extends BaseScene {
   public squareScoreText: any;
 
   constructor(config: object) {
-    super("ScoreDebugScene", config);
+    super("ScoreDebugScene", {...config, canGoBack: true});
   }
 
   setCircleScoreCounter(newScore: number) {
@@ -30,6 +30,7 @@ export default class ScoreDebugScene extends BaseScene {
   preload(): void {}
 
   create(): void {
+    super.create();
     const { width, height } = this.getConfig();
 
     // create sensors

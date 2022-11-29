@@ -10,7 +10,7 @@ export default class TypesDebugScene extends BaseScene{
   public clickmetext: any | Phaser.GameObjects.Text;;
 
   constructor(config: object) {
-    super("TypesDebugScene", config);
+    super("TypesDebugScene", {...config, canGoBack: true});
     this.textString = "";
     this.numberPlaceholder = 0;
     this.objectPlaceholder = {};
@@ -59,6 +59,7 @@ export default class TypesDebugScene extends BaseScene{
   }
 
   create() {
+    super.create();
     this.clickmetext = this.add
       .text(100, 100, this.getTextString(), {font: "50px Arial Black", fill: "#fff"})
       .setInteractive();

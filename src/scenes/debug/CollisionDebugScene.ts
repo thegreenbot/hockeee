@@ -5,7 +5,7 @@ export default class CollisionDebugScene extends BaseScene {
 
 
   constructor(config: object) {
-    super('CollisionDebugScene', config);
+    super('CollisionDebugScene', {...config, canGoBack: true});
   }
 
   preload() { }
@@ -29,6 +29,7 @@ export default class CollisionDebugScene extends BaseScene {
   }
 
   create(): void {
+    super.create();
 
     const canCollide = function(filterA, filterB) {
       if (filterA.group === filterB.group && filterA.group !== 0)

@@ -11,11 +11,12 @@ export default class PlayScene extends BaseScene {
   public topBar: any;
   public bottomBar: any;
   public turnStarted: boolean;
+  public isPaused: boolean;
 
   constructor(config: object) {
     super("PlayScene", config);
     this.sling = null;
-
+    this.isPaused = false;
     this.turnStarted = false;
     this.player1Text = "player 1: 0";
     this.player2Text = "player 2: 0";
@@ -45,6 +46,21 @@ export default class PlayScene extends BaseScene {
       });
     });
   }
+
+  createPause() {
+    this.isPaused = true;
+    const pauseButton = this.add.image(this.config.width -10, this.config.height -10, 'pause')
+    .setOrigin(1)
+    .setScale(3)
+    .setInteractive();
+
+    pauseButton.on('pointerdown', () => {
+      console.log('pause');
+      this.matter.pause();
+      this.scene.pause();
+      this.scene.launch('PauseScene');
+    });
+  };
 
   createBalls() {
     const playConfig = this.getPlayConfig();
@@ -276,6 +292,7 @@ export default class PlayScene extends BaseScene {
   create(): void {
     this.createCollisionGroups();
     this.createGameGrid();
+    this.createPause();
     this.createAnims();
     this.createBalls();
     this.createInputs();

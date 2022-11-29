@@ -9,6 +9,8 @@ class BaseScene extends Phaser.Scene {
   public nonCollidingGroup: number;
   public collidingCategory: number;
   public noncollidingCategory: number;
+  public fontOptions: object;
+  public menu: object;
 
   constructor(key: string, config: object) {
     super(key);
@@ -17,6 +19,8 @@ class BaseScene extends Phaser.Scene {
     this.nonCollidingGroup= 0;
     this.collidingCategory=0;
     this.noncollidingCategory=0;
+    this.fontOptions = { fontSize: `32px`, fill: '#fff' };
+    this.menu = {};
 
     this.playConfig = {
       currentPlayer: 'player1',
@@ -79,6 +83,17 @@ class BaseScene extends Phaser.Scene {
     this.playConfig = config;
   }
 
+  createMenu(menu, setupMenuEvents) {
+    const {width, height}= this.getConfig();
+    let lastMenuPosition = 0;
+    menu.forEach(menuItem => {
+      const menuPosition = [width/2, height/2 + lastMenuPosition];
+      menuItem.textObject = this.add.text(...menuPosition, menuItem.text, this.fontOptions).setOrigin(0.5, 1);
+      lastMenuPosition += 42;
+      setupMenuEvents(menuItem);
+    })
+  }
+
   createBall(x: number, y: number, frame: number, player: string, index: number): Phaser.Physics.Matter.Sprite {
     const matterBodyConfig: Phaser.Types.Physics.Matter.MatterBodyConfig = {
       restitution: 1,
@@ -87,9 +102,6 @@ class BaseScene extends Phaser.Scene {
       frictionAir: 0.03
     }
     const ball = this.matter.add.sprite(x, y, 'poke', frame, matterBodyConfig);
-    ball.setAlpha(0.5);
-    ball.setScale(0.5);
-    ball.disableInteractive();
     ball.name = `${player}Ball-${index}`;
     return ball;
   };
@@ -107,7 +119,14 @@ class BaseScene extends Phaser.Scene {
     });
   };
   preload(): void { }
-  create(): void { }
+  create(): void {
+    if (this.config.canGoBack) {
+      const backButton = this.add.image(this.config.width - 10, this.config.height - 10, 'back').setOrigin(1).setScale(2).setInteractive();
+      backButton.on('pointerup', () => {
+          this.scene.start('DebugMenuScene');
+      });
+  }
+   }
   update(time: number, delta: number): void { }
 
 }
