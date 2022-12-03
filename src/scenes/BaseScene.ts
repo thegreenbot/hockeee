@@ -15,59 +15,16 @@ class BaseScene extends Phaser.Scene {
   constructor(key: string, config: object) {
     super(key);
     this.config = config;
-    this.collidingGroup= 0;
-    this.nonCollidingGroup= 0;
+    this.collidingGroup=0;
+    this.nonCollidingGroup=0;
     this.collidingCategory=0;
     this.noncollidingCategory=0;
     this.fontOptions = { fontSize: `32px`, fill: '#fff' };
     this.menu = {};
 
     this.playConfig = {
-      currentPlayer: 'player1',
-      currentSling: null,
+      currentPlayer: 0,
       numPlayers: 4,
-      players: {
-        player1: {
-          name: 'player1',
-          score: 0,
-          ammo: [],
-          spriteFrame: 0,
-          start: {
-            x: 20,
-            y: config.height - 20
-          }
-        },
-        player2: {
-          name: 'player2',
-          score: 0,
-          ammo: [],
-          spriteFrame: 12,
-          start: {
-            x: config.width - 20,
-            y: 20
-          }
-        },
-        player3: {
-          name: 'player3',
-          score: 0,
-          ammo: [],
-          spriteFrame: 24,
-          start: {
-            x: config.width - 20,
-            y: config.height - 20
-          }
-        },
-        player4: {
-          name: 'player4',
-          score: 0,
-          ammo: [],
-          spriteFrame: 36,
-          start: {
-            x: 20,
-            y: 20
-          }
-        }
-      }
     };
   }
 
@@ -118,8 +75,16 @@ class BaseScene extends Phaser.Scene {
       repeat: -1
     });
   };
+
+  createCollisionGroups() {
+    this.nonCollidingGroup = this.matter.world.nextGroup(true);
+    this.collidingGroup = this.matter.world.nextGroup();
+    this.collidingCategory = this.matter.world.nextCategory();
+  }
+
   preload(): void { }
   create(): void {
+    this.createCollisionGroups();
     if (this.config.canGoBack) {
       const backButton = this.add.image(this.config.width - 10, this.config.height - 10, 'back').setOrigin(1).setScale(2).setInteractive();
       backButton.on('pointerup', () => {

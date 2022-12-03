@@ -11,6 +11,7 @@ import BallDamageScene from "./scenes/debug/BallDamageScene";
 import MenuScene from "./scenes/MenuScene";
 import DebugMenuScene from "./scenes/DebugMenuScene";
 import PauseScene from "./scenes/PauseScene";
+import SlingScene from "./scenes/debug/SlingScene";
 
 const scale = mobileAndTabletCheck()
   ? {
@@ -35,6 +36,7 @@ const Scenes = [
   ScoreDebugScene,
   BallAnimationScene,
   BallDamageScene,
+  SlingScene,
   PlayScene,
 ];
 

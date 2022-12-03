@@ -38,7 +38,6 @@ export default class CollisionDebugScene extends BaseScene {
       return (filterA.mask & filterB.category) !== 0 && (filterB.mask & filterA.category) !== 0;
     };
 
-
     this.collidingCategory = this.matter.world.nextCategory();
     this.noncollidingCategory = this.matter.world.nextCategory();
     this.collidingGroup = this.matter.world.nextGroup();

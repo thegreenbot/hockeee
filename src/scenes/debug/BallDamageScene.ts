@@ -8,41 +8,6 @@ export default class BallDamageScene extends BaseScene {
     super("BallDamageScene", {...config, canGoBack: true});
   }
 
-  preload() {
-    this.load.spritesheet("healingring", "healingring.png", {
-      frameWidth: 191.6,
-      frameHeight: 192,
-    });
-    this.load.spritesheet("explosion", "explosion.png", {
-      frameWidth: 128,
-      frameHeight: 128,
-    });
-  }
-
-  createAnims() {
-    this.anims.create({
-      key: "healingring_idle",
-      frames: this.anims.generateFrameNumbers("healingring", {
-        start: 10,
-        end: 14,
-      }),
-      frameRate: 12,
-      repeat: -1,
-      yoyo: true,
-    });
-
-    this.anims.create({
-      key: "healingring_heal",
-      frames: this.anims.generateFrameNumbers("healingring", {
-        start: 0,
-        end: 14,
-      }),
-      frameRate: 30,
-      repeat: 0,
-      yoyo: false,
-    });
-  }
-
   create() {
     super.create();
     const { height, width } = this.getConfig();
