@@ -10,6 +10,7 @@ export default class Player {
     private playerIndex: number;
     private emitterColors = ['red', 'blue', 'yellow', 'green'];
     private startVectors: Array<Vector>;
+    private text: Phaser.GameObjects.Text|null = null;
     
     private baseSpriteFrames = [0, 12, 24, 36];
     
@@ -23,6 +24,14 @@ export default class Player {
             {x: config.width - 20, y: config.height - 20},
             {x: 20, y: 20}
         ];
+    }
+
+    setTextObject(textObject: Phaser.GameObjects.Text): void {
+        this.text = textObject;
+    }
+
+    getTextObject(): Phaser.GameObjects.Text|null {
+        return this.text;
     }
 
     getScore(): number {
@@ -43,6 +52,14 @@ export default class Player {
 
     getAmmo(): Ball|undefined {
         return this.ammo.pop();
+    }
+
+    getAllAmmo(): Array<Ball> {
+        return this.ammo;
+    }
+
+    getAmmoCount(): number {
+        return this.ammo.length
     }
 
     getName(): string {

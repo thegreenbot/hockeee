@@ -28,7 +28,7 @@ class BaseScene extends Phaser.Scene {
     };
   }
 
-  getConfig() {
+  getConfig(): Phaser.Types.Core.GameConfig {
     return this.config;
   }
 
