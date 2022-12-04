@@ -1,3 +1,4 @@
+import Ball from "../../gameObjects/Ball";
 import BaseScene from "../BaseScene";
 
 export default class BallAnimationScene extends BaseScene {
@@ -40,6 +41,8 @@ export default class BallAnimationScene extends BaseScene {
       0,
       { ...matterBodyConfig, label: "poke1" }
     );
+
+    const poke1 = new Ball(this, width /2 - 100, height /2, 0, particles, )
 
     const poke2 = this.matter.add.sprite(
       width / 2 - 50,

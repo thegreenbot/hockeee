@@ -50,6 +50,7 @@ export default class ScoreDebugScene extends BaseScene {
         isStatic: true,
         label: "squaregoal",
       });
+    squareGoal.flipY = true;
     squareGoal.displayHeight = height / 2 - 100;
     squareGoal.displayWidth = width;
     squareGoal.setDepth(0);

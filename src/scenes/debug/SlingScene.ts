@@ -7,8 +7,8 @@ export default class SlingScene extends BaseScene {
   public sling: MatterJS.ConstraintType | null = null;
   private players: Array<Player> = [];
   public turnStarted = false;
+  public activeTween: Phaser.Tweens.Tween|null = null;
 
-  private lastPlayer: number = 0;
   private currentPlayer: number = 0;
 
   constructor(config: object) {
@@ -28,7 +28,6 @@ export default class SlingScene extends BaseScene {
   }
 
   createAmmo(ammoCount: number = 2) {
-    const playConfig = this.getPlayConfig();
     var particlesManager = this.add.particles("flares");
 
     this.players.map((player, index) => {
@@ -110,10 +109,20 @@ export default class SlingScene extends BaseScene {
     ball?.setX(posX);
     ball?.setY(posY);
     ball?.setScale(1);
+    ball.setDepth(1);
     ball?.setInteractive();
     ball?.setStatic(false);
     this.input.setDraggable(ball);
     this.sling = this.matter.add.constraint(startRect, ball?.body, 0, 0.1);
+    this.activeTween = this.tweens.add({
+      targets: ball,
+      scale: 0.8,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut',
+      duration: 1000,
+      delay: 100
+    })
   }
 
   createInputs() {
@@ -129,6 +138,8 @@ export default class SlingScene extends BaseScene {
           ball.body.gameObject.disableInteractive();
           ball.body.ignorePointer = true;
           this.matter.world.remove(this.sling);
+          this.tweens.remove(this.activeTween);
+          
         }, 20);
       }, this
     );
@@ -136,6 +147,7 @@ export default class SlingScene extends BaseScene {
 
   create() {
     super.create();
+    this.lights.enable().setAmbientColor(0x555555);
     this.createPlayers();
     this.createAnimations();
     this.createAmmo(5);

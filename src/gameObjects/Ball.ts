@@ -39,7 +39,6 @@ export default class Ball extends Phaser.Physics.Matter.Sprite {
     });
 
     emitter.startFollow(this);
-    
     scene.add.existing(this);
   }
 
