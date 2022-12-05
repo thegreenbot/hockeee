@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import Ball from "../gameObjects/Ball";
 import Player from "../gameObjects/Player";
+import { createCollisionEvents } from "../utils/collisionEvents";
 import BaseScene from "./BaseScene";
 
 export default class PlayScene extends BaseScene {
@@ -73,7 +74,6 @@ export default class PlayScene extends BaseScene {
         ball.setCollisionGroup(this.nonCollidingGroup);
         player.addAmmo(ball);
         this.ammo.push(ball);
-
         
       }
     });
@@ -256,70 +256,6 @@ export default class PlayScene extends BaseScene {
     return stopped;
   }
 
-  createCollisionEvents() {
-    // additive
-    this.matterCollision.addOnCollideStart({
-      objectA: [this.topGoal, this.bottomBar],
-      objectB: this.ammo,
-      callback: (eventData) => {
-        const { bodyA, bodyB } = eventData;
-        const belongsTo = bodyB.gameObject.getData("belongsto");
-
-        if (bodyA.label === "topgoal") {
-          if (belongsTo === "player1") {
-            const score = this.players[0].getScore();
-            this.players[0].setScore(score + 1);
-          }
-          if (belongsTo === "player3") {
-            const score = this.players[2].getScore();
-            this.players[2].setScore(score + 1);
-          }
-        }
-        if (bodyA.label === "bottomgoal") {
-          if (belongsTo === "player2") {
-            const score = this.players[1].getScore();
-            this.players[1].setScore(score + 1);
-          }
-          if (belongsTo === "player4") {
-            const score = this.players[3].getScore();
-            this.players[3].setScore(score + 1);
-          }
-        }
-      },
-    });
-    // subtractive
-    this.matterCollision.addOnCollideEnd({
-      objectA: [this.topGoal, this.bottomGoal],
-      objectB: this.ammo,
-      callback: (eventData) => {
-        const { bodyA, bodyB } = eventData;
-        const belongsTo = bodyB.gameObject.getData("belongsto");
-        if (bodyB.speed !== 0) {
-          if (bodyA.label === "topgoal") {
-            if (belongsTo === "player1") {
-              const score = this.players[0].getScore();
-              this.players[0].setScore(score - 1);
-            }
-            if (belongsTo === "player3") {
-              const score = this.players[2].getScore();
-              this.players[2].setScore(score - 1);
-            }
-          }
-          if (bodyA.label === "bottomgoal") {
-            if (belongsTo === "player2") {
-              const score = this.players[1].getScore();
-              this.players[1].setScore(score - 1);
-            }
-            if (belongsTo === "player4") {
-              const score = this.players[3].getScore();
-              this.players[3].setScore(score - 1);
-            }
-          }
-        }
-      },
-    });
-  }
-
   create(): void {
     this.createCollisionGroups();
     this.createPlayers();
@@ -328,7 +264,7 @@ export default class PlayScene extends BaseScene {
     this.createAnimations();
     this.createAmmo(5);
     this.createInputs();
-    this.createCollisionEvents();
+    createCollisionEvents([this.topGoal, this.bottomGoal], this.ammo, this);
     this.startTurn(0);
 
     this.matter.world.setBounds();

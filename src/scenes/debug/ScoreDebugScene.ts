@@ -1,3 +1,4 @@
+import { createCollisionEvents } from "../../utils/collisionEvents";
 import BaseScene from "../BaseScene";
 
 export default class ScoreDebugScene extends BaseScene {
@@ -38,7 +39,7 @@ export default class ScoreDebugScene extends BaseScene {
       .image(width/2, height/2 - 150, "bg1", undefined, {
         isSensor: true,
         isStatic: true,
-        label: "circlegoal",
+        label: "topgoal",
       });
     circlegoal.displayHeight = height / 2 - 100;
     circlegoal.displayWidth = width;
@@ -48,7 +49,7 @@ export default class ScoreDebugScene extends BaseScene {
       .image(width/2, height/2 + 150, "bg3", undefined, {
         isSensor: true,
         isStatic: true,
-        label: "squaregoal",
+        label: "bottomgoal",
       });
     squareGoal.flipY = true;
     squareGoal.displayHeight = height / 2 - 100;
