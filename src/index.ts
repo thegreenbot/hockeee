@@ -12,6 +12,7 @@ import MenuScene from "./scenes/MenuScene";
 import DebugMenuScene from "./scenes/DebugMenuScene";
 import PauseScene from "./scenes/PauseScene";
 import SlingScene from "./scenes/debug/SlingScene";
+import ParallaxScene from "./scenes/debug/ParallaxScene";
 
 const scale = mobileAndTabletCheck()
   ? {
@@ -36,6 +37,7 @@ const Scenes = [
   ScoreDebugScene,
   BallAnimationScene,
   BallDamageScene,
+  ParallaxScene,
   SlingScene,
   PlayScene,
 ];
@@ -66,7 +68,7 @@ const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   scale: scale,
   physics: {
-    default: "matter",
+    default: 'matter',
     matter: {
       debug: true,
       gravity: false,
