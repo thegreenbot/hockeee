@@ -16,7 +16,7 @@ class PreloadScene extends BaseScene {
     }
 
     create(): void {
-         this.scene.start('ParallaxScene');
+         this.scene.start('MenuScene');
     }
 }
 

@@ -12,6 +12,7 @@ export default class DebugMenuScene extends BaseScene {
       { scene: 'CollisionDebugScene', text: 'Collisions'},
       { scene: 'ScoreDebugScene', text: 'Tally Score'},
       { scene: 'SlingScene', text: 'Sling'},
+      { scene: 'ParallaxScene', text: 'Parallax'},
       { scene: 'TypesDebugScene', text: 'Types'},
       { scene: 'MenuScene', text: 'Back' }
     ]

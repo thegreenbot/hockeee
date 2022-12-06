@@ -8,7 +8,7 @@ export default class ParallaxScene extends BaseScene {
     playBottomScene: Boolean = false;
     
     constructor(config: object) {
-        super('ParallaxScene', config);
+        super('ParallaxScene', {...config, canGoBack: true});
     }
 
     preload() {
@@ -28,7 +28,7 @@ export default class ParallaxScene extends BaseScene {
     }
 
     create() {
-
+      super.create();
       // screen is divided into 100px -> 50% - 200px -> 50% - 200px -> 100px;
 
       const config = this.getConfig();
@@ -105,11 +105,8 @@ export default class ParallaxScene extends BaseScene {
       }, this);
 
       bottomText.on('pointerup', function() {
-        console.log('click');
         this.playBottomScene = (this.playBottomScene) ? false : true;
       }, this)
-
-
 
     }
 
@@ -128,7 +125,6 @@ export default class ParallaxScene extends BaseScene {
 
       if (this.playBottomScene) {
         this.bottomGoalMountains?.each(item => {
-          console.log('scrolling');
           const scrollSpeed = item.data.get('scrollspeed');
           item.tilePositionX -= scrollSpeed;
         }) 
