@@ -1,19 +1,17 @@
 export default class TopGoal {
   scene: Phaser.Scene;
   config: object;
-  topGoal: Phaser.GameObjects.Container | null = null;
+  goal: Phaser.GameObjects.Container | null = null;
+  sensor: Phaser.Types.Physics.Matter.MatterBody;
+  playing: boolean = false;
 
   constructor(scene: Phaser.Scene, config: object) {
     this.scene = scene;
     this.config = config;
-  }
-
-  createGameObjects() {
     const { width, height } = this.config;
     const originX = width / 2;
-    const topOriginY = height / 2 - (height / 2 - 200);
+    const topOriginY = height / 2 - (height / 2 - 100)/2;
     const backgroundHeight = height / 2 - 100;
-    const bottomOriginY = height / 2 + 200;
     const baseHeight = 1080;
     const baseWidth = 1920;
     const ratio = backgroundHeight / baseHeight;
@@ -45,10 +43,25 @@ export default class TopGoal {
       .setDataEnabled();
       rocks2.data.set('scrollspeed', 0.5);
     
-      this.topGoal = this.scene.add.container(0, 0, [bg1, cloud1, cloud2, rocks1, rocks2]).setName("topgoal");
-    this.topGoal.each(item => {
+      this.goal = this.scene.add.container(0, 0, [bg1, cloud1, cloud2, rocks1, rocks2]).setName("topgoal");
+    this.goal.each(item => {
         item.setPipeline('Light2D');
         item.setDisplaySize(width, backgroundHeight);
     });
+
+    this.sensor = this.scene.matter.add.rectangle(width/2, topOriginY, width, backgroundHeight, {isSensor: true, isStatic: true, label: "topgoal"});
   }
+
+  public play(): void {
+    this.playing = true;
+  }
+
+  public stop(): void {
+    this.playing = false;
+  }
+  
+  public getSensor(): Phaser.Types.Physics.Matter.MatterBody {
+    return this.sensor;
+  }
+  
 }

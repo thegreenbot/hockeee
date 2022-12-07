@@ -1,6 +1,8 @@
 import Phaser from "phaser";
 import Ball from "../gameObjects/Ball";
+import BottomGoal from "../gameObjects/BottomGoal";
 import Player from "../gameObjects/Player";
+import TopGoal from "../gameObjects/TopGoal";
 import { createCollisionEvents } from "../utils/collisionEvents";
 import BaseScene from "./BaseScene";
 
@@ -8,14 +10,14 @@ export default class PlayScene extends BaseScene {
   public sling: MatterJS.ConstraintType | null = null;
   public topBar: any;
   public bottomBar: any;
-  public topGoal: Phaser.Physics.Matter.Image | null = null;
-  public bottomGoal: Phaser.Physics.Matter.Image | null = null;
   public turnStarted: boolean = false;
   public isPaused: boolean = false;
   private players: Array<Player> = [];
   public ammo: Array<Ball> = [];
   public currentPlayer: number = 0;
   public activeTween: Phaser.Tweens.Tween | null = null;
+  public topGoal: TopGoal | null = null;
+  public bottomGoal: BottomGoal | null = null;
 
   constructor(config: object) {
     super("PlayScene", config);
@@ -79,7 +81,7 @@ export default class PlayScene extends BaseScene {
         ball.setScale(0.5);
         ball.setStatic(true);
 
-        ball.setCollisionGroup(this.nonCollidingGroup);       
+        ball.setCollisionGroup(this.nonCollidingGroup);
         player.addAmmo(ball);
         this.ammo.push(ball);
       }
@@ -142,23 +144,36 @@ export default class PlayScene extends BaseScene {
   createSling() {
     const config = this.getConfig();
     const posX = config.width / 2;
-    const posY =
-      this.currentPlayer === 0 || this.currentPlayer === 2
-        ? config?.height - 70
-        : 70;
+    let posY = 70;
+    if (this.currentPlayer === 0 || this.currentPlayer === 2) {
+      posY = config.height - 70;
+      this.topGoal?.play();
+      this.bottomGoal?.stop();
+    } else {
+      posY = 70;
+      this.topGoal?.stop();
+      this.bottomGoal?.play();
+    }
     const startRect = this.matter.add.rectangle(posX, posY, 5, 5, {
       isStatic: true,
       collisionFilter: { group: this.nonCollidingGroup },
     });
     const ball = this.players[this.currentPlayer].getAmmo();
-    ball?.setX(posX);
-    ball?.setY(posY);
-    ball?.setScale(1);
-    ball?.setDepth(1);
-    ball?.setInteractive();
-    ball?.setStatic(false);
-    this.input.setDraggable(ball);
+    this.makeAmmoPlayable(ball);
+    console.log(ball);
+    this.tweens.add({
+      targets: ball,
+      x: posX,
+      y: posY,
+      yoyo: false,
+      repeat: 0,
+      ease: 'Sine.easeInOut',
+      duration: 500,
+      delay: 0
+    });
+    setTimeout(() => {
     this.sling = this.matter.add.constraint(startRect, ball?.body, 0, 0.1);
+    }, 500);
     this.activeTween = this.tweens.add({
       targets: ball,
       scale: 0.8,
@@ -170,6 +185,17 @@ export default class PlayScene extends BaseScene {
     });
   }
 
+  makeAmmoPlayable(ammo: Ball | undefined) {
+    if (ammo) {
+      ammo.setScale(1);
+      ammo.setDepth(1);
+      ammo.setInteractive();
+      ammo.setStatic(false);
+      this.input.setDraggable(ammo);
+      ammo.body.ignorePointer = false;
+    }
+  }
+
   createCollisionGroups() {
     this.nonCollidingGroup = this.matter.world.nextGroup(true);
     this.collidingGroup = this.matter.world.nextGroup();
@@ -178,7 +204,6 @@ export default class PlayScene extends BaseScene {
 
   createInputs() {
     this.input.on("dragend", (pointer, ball) => {
-      this.turnStarted = true;
       setTimeout(() => {
         this.input.setDraggable(ball.body.gameObject, false);
         this.sling.bodyB = null;
@@ -188,43 +213,26 @@ export default class PlayScene extends BaseScene {
         ball.body.ignorePointer = true;
         this.matter.world.remove(this.sling);
         this.tweens.remove(this.activeTween);
+        this.turnStarted = true;
       }, 20);
     });
   }
 
   createGameGrid() {
     const config = this.getConfig();
-
-    this.topGoal = this.matter.add.image(
+    const rect = this.add.line(
       config.width / 2,
-      config.height / 2 - 150,
-      "bg1",
-      undefined,
-      {
-        isSensor: true,
-        isStatic: true,
-        label: "topgoal",
-      }
+      0,
+      0,
+      config.height / 2,
+      config.width,
+      config.height / 2,
+      0xff0000
     );
-    this.topGoal.flipY = true;
-    this.topGoal.displayHeight = config.height / 2 - 100;
-    this.topGoal.setDepth(0);
+    rect.setDepth(10);
 
-    // background 2
-    this.bottomGoal = this.matter.add.image(
-      config.width / 2,
-      config.height / 2 + 150,
-      "bg3",
-      undefined,
-      {
-        isSensor: true,
-        isStatic: true,
-        label: "bottomgoal",
-      }
-    );
-    this.bottomGoal.displayHeight = config.height / 2 - 100;
-    this.bottomGoal.displayWidth = config.width;
-    this.bottomGoal.flipY = true;
+    this.topGoal = new TopGoal(this, config);
+    this.bottomGoal = new BottomGoal(this, config);
 
     // Player text
     const p1t = this.players[0].getTextObject();
@@ -251,7 +259,7 @@ export default class PlayScene extends BaseScene {
       if (!stopped) {
         return;
       }
-      if (ball.body.speed != 0) {
+      if (ball.body.speed >= 0.05) {
         stopped = false;
       }
     });
@@ -262,11 +270,16 @@ export default class PlayScene extends BaseScene {
     this.createCollisionGroups();
     this.createPlayers();
     this.createGameGrid();
+    this.lights.enable();
+    this.lights.setAmbientColor(0x808080);
+    this.lights.addLight(0, 0, 10);
     this.createPause();
     this.createAnimations();
     this.createAmmo(5);
     this.createInputs();
-    createCollisionEvents([this.topGoal, this.bottomGoal], this.ammo, this);
+    const topgoal = this.topGoal?.getSensor();
+    const bottomgoal = this.bottomGoal?.getSensor();
+    createCollisionEvents([topgoal, bottomgoal], this.ammo, this);
     setTimeout(() => {
       this.startTurn(0);
     }, 400);
@@ -275,66 +288,66 @@ export default class PlayScene extends BaseScene {
     this.matter.add.mouseSpring();
   }
 
+  possessAmmo(player: string, ammo: Ball) {
+    let frame = 0;
+    let targetPlayer = null;
+    switch (player) {
+      case "player1":
+        frame = 0;
+        targetPlayer = this.players[0];
+        break;
+      case "player2":
+        frame = 12;
+        targetPlayer = this.players[1];
+        break;
+      case "player3":
+        frame = 24;
+        targetPlayer = this.players[2];
+        break;
+      case "player4":
+        frame = 36;
+        targetPlayer = this.players[3];
+        break;
+    }
+    targetPlayer?.addAmmo(ammo);
+    ammo.setFrame(frame);
+    ammo.setAnimationName(player);
+    ammo.body.gameObject.setData("belongsTo", player);
+    ammo.setCollisionGroup(this.nonCollidingGroup);
+    ammo.setScale(0.5);
+    ammo.disableInteractive();
+    ammo.setStatic(true);
+    this.input.setDraggable(ammo.body.gameObject, false);
+  }
+
   cleanup(): void {
     const config = this.getConfig();
 
     this.ammo.forEach((ammo) => {
       if (ammo.body && !ammo.body.isStatic) {
-        const { position, gameObject } = ammo.body;
+        const { position } = ammo.body;
         // if body in top area
-        if (position.y < 80) {
+        if (position.y < 100) {
           // is in p4 quadrant?
           if (position.x < config.width / 2) {
-            gameObject.setData("belongsTo", "player4");
-            this.players[3].addAmmo(ammo);
-            ammo.setCollisionGroup(this.nonCollidingGroup);
-            ammo.setScale(0.5);
-            this.input.setDraggable(ammo, false);
-            ammo.disableInteractive();
-            ammo.setStatic(true);
-            ammo.setFrame(36);
-            ammo.setAnimationName("player4");
+            this.possessAmmo("player4", ammo);
           }
 
           // is in p2 quadrant?
           if (position.x > config.width / 2) {
-            gameObject.setData("belongsTo", "player2");
-            this.players[1].addAmmo(ammo);
-            ammo.setCollisionGroup(this.nonCollidingGroup);
-            ammo.setScale(0.5);
-            this.input.setDraggable(ammo, false);
-            ammo.disableInteractive();
-            ammo.setStatic(true);
-            ammo.setFrame(12);
-            ammo.setAnimationName("player2");
+            this.possessAmmo("player2", ammo);
           }
         }
 
         // if body in bottom area
-        if (position.y > config.height - 80) {
+        if (position.y > config.height - 100) {
           // is in p3 quadrant
           if (position.x > config.width / 2) {
-            gameObject.setData("belongsTo", "player3");
-            this.players[2].addAmmo(ammo);
-            ammo.setCollisionGroup(this.nonCollidingGroup);
-            ammo.setScale(0.5);
-            this.input.setDraggable(ammo, false);
-            ammo.disableInteractive();
-            ammo.setStatic(true);
-            ammo.setFrame(24);
-            ammo.setAnimationName("player3");
+            this.possessAmmo("player3", ammo);
           }
           // is in p1 quadrant
           if (position.x < config.width / 2) {
-            gameObject.setData("belongsTo", "player1");
-            this.players[0].addAmmo(ammo);
-            ammo.setCollisionGroup(this.nonCollidingGroup);
-            ammo.setScale(0.5);
-            this.input.setDraggable(ammo, false);
-            ammo.disableInteractive();
-            ammo.setStatic(true);
-            ammo.setFrame(0);
-            ammo.setAnimationName("player1");
+            this.possessAmmo("player1", ammo);
           }
         }
       }
@@ -343,10 +356,24 @@ export default class PlayScene extends BaseScene {
     this.arrangeAmmo();
   }
 
+  playGoalScenes() {
+    const goals = [this.topGoal, this.bottomGoal];
+    goals.forEach(zone => {
+      if (zone?.playing) {
+        zone?.goal?.each(item => {
+          const scrollSpeed = item.data.get("scrollspeed");
+          item.tilePositionX += scrollSpeed * 2;
+        });
+      }
+    })
+  }
+
   update(time: number, delta: number): void {
     this.ammo.forEach((ball: Ball) => {
       ball.updateAnimation();
     });
+
+    this.playGoalScenes();
 
     if (this.turnStarted) {
       // fire off method to check speed of matter bodies.
@@ -356,7 +383,7 @@ export default class PlayScene extends BaseScene {
 
         setTimeout(() => {
           this.startTurn();
-        }, 100);
+        }, 200);
       }
     }
 

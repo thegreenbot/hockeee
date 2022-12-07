@@ -98,7 +98,7 @@ export default class Ball extends Phaser.Physics.Matter.Sprite {
     }
   }
 
-  public reduceHealth(timestamp) {
+  public reduceHealth(timestamp: number) {
     console.log(`reduce health ${this.data.get('health')}`);
     if (this.data.get("health") >= 1) {
       const health = this.data.get("health");
