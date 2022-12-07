@@ -9,7 +9,7 @@ export function createCollisionEvents(
     objectA: goals,
     objectB: ammo,
     callback: (eventData) => {
-      const { bodyA, gameObjectB } = eventData;
+      const { bodyA, bodyB, gameObjectB } = eventData;
       const gameObjectBData = gameObjectB.data
         ? gameObjectB.data.getAll()
         : false;
@@ -19,11 +19,13 @@ export function createCollisionEvents(
             const score = scene.players[0].getScore();
             scene.players[0].setScore(score + 1);
             gameObjectB.data.set("ongoal", true);
+            gameObjectB.addSpotlight();
           }
           if (gameObjectBData["belongsto"] === "player3" && !gameObjectBData["ongoal"]) {
             const score = scene.players[2].getScore();
             scene.players[2].setScore(score + 1);
             gameObjectB.data.set("ongoal", true);
+            gameObjectB.addSpotlight();
           }
         }
         if (bodyA.label === "bottomgoal") {
@@ -31,11 +33,13 @@ export function createCollisionEvents(
             const score = scene.players[1].getScore();
             scene.players[1].setScore(score + 1);
             gameObjectB.data.set("ongoal", true);
+            gameObjectB.addSpotlight();
           }
           if (gameObjectBData["belongsto"] === "player4" && !gameObjectBData["ongoal"]) {
             const score = scene.players[3].getScore();
             scene.players[3].setScore(score + 1);
             gameObjectB.data.set("ongoal", true);
+            gameObjectB.addSpotlight();
           }
         }
       }
@@ -57,11 +61,13 @@ export function createCollisionEvents(
               const score = scene.players[0].getScore();
               scene.players[0].setScore(score - 1);
               gameObjectB.data.set("ongoal", false);
+              gameObjectB.destroySpotlight();
             }
             if (gameObjectBData["belongsto"] === "player3") {
               const score = scene.players[2].getScore();
               scene.players[2].setScore(score - 1);
               gameObjectB.data.set("ongoal", false);
+              gameObjectB.destroySpotlight();
             }
           }
           if (bodyA.label === "bottomgoal") {
@@ -69,11 +75,13 @@ export function createCollisionEvents(
               const score = scene.players[1].getScore();
               scene.players[1].setScore(score - 1);
               gameObjectB.data.set("ongoal", false);
+              gameObjectB.destroySpotlight();
             }
             if (gameObjectBData["belongsto"] === "player4") {
               const score = scene.players[3].getScore();
               scene.players[3].setScore(score - 1);
               gameObjectB.data.set("ongoal", false);
+              gameObjectB.destroySpotlight();
             }
           }
         }

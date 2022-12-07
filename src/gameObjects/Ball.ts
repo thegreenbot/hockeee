@@ -44,19 +44,19 @@ export default class Ball extends Phaser.Physics.Matter.Sprite {
   }
 
   public spotlightColor() {
-    let color = '#ffffff';
+    let color = '0xffffff';
     switch(this.animationName) {
       case 'player1':
-        color = '#E22016'
+        color = '0xE22016'
         break;
       case 'player2':
-        color = '#E6DF0C'
+        color = '0xE6DF0C'
         break;
       case 'player3':
-        color = '#E60CE6';
+        color = '0xE60CE6';
         break;
       case 'player4':
-        color = '#0C2EE6';
+        color = '0x0C2EE6';
         break;
     }
     return color;
@@ -80,7 +80,7 @@ export default class Ball extends Phaser.Physics.Matter.Sprite {
 
   public addSpotlight() {
     const {x, y }= this.body.position;
-    this.spotLight = this.scene.lights.addLight(x, y, 60, this.spotlightColor(), 4);
+    this.spotLight = this.scene.lights.addLight(x, y, 70, this.spotlightColor(), 4);
   }
 
   public destroySpotlight() {

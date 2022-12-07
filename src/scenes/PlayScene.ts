@@ -111,7 +111,18 @@ export default class PlayScene extends BaseScene {
     }
   }
 
-  setCurrentPlayer() {
+  setCurrentPlayer(index: number) {
+    const current = this.currentPlayer;
+    if (index) {
+      if (this.players[index].hasAmmo()) {
+        this.currentPlayer = index;
+      } else if(current < 3) {
+        this.setCurrentPlayer(current + 1);
+      } else {
+        this.setCurrentPlayer(0);
+      }
+    }
+
     this.currentPlayer < 3 ? this.currentPlayer++ : (this.currentPlayer = 0);
   }
 
@@ -371,6 +382,7 @@ export default class PlayScene extends BaseScene {
   update(time: number, delta: number): void {
     this.ammo.forEach((ball: Ball) => {
       ball.updateAnimation();
+      ball.setSpotlightPosition();
     });
 
     this.playGoalScenes();
