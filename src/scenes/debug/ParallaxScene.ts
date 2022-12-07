@@ -33,7 +33,7 @@ export default class ParallaxScene extends BaseScene {
 
       const config = this.getConfig();
       const originX = config.width/2;
-      const topBackgroundOriginY = config.height/2 - 200;
+      const topBackgroundOriginY = config.height/2 - (config.height/2 - 200);
       const topBackgroundHeight = config.height/2 - 100;
       const bottomOriginY = config.height/2 + 200;
       const imageBaseHeight = 1080;
@@ -44,47 +44,70 @@ export default class ParallaxScene extends BaseScene {
       const bg1 = this.add.image(originX, topBackgroundOriginY, 'bg1_sky').setDisplaySize(config.width, topBackgroundHeight);
       bg1.setDataEnabled();
       bg1.data.set('scrollspeed', 0);
-      const cloud1 = this.add.tileSprite(originX, topBackgroundOriginY, imageBaseWidth, imageBaseHeight, 'bg1_clouds_1');
+
+      const cloud1 = this.add.tileSprite(originX, topBackgroundOriginY, config.width, topBackgroundHeight, 'bg1_clouds_1')
       cloud1.setScale(heightRatio);
       cloud1.setDataEnabled();
       cloud1.data.set('scrollspeed', 0.1);
+      
       const cloud2 = this.add.tileSprite(originX, topBackgroundOriginY, imageBaseWidth, imageBaseHeight, 'bg1_clouds_2');
       cloud2.setScale(heightRatio);
       cloud2.setDataEnabled();
       cloud2.data.set('scrollspeed', 0.12);
+
       const rocks1 = this.add.tileSprite(originX, topBackgroundOriginY, imageBaseWidth, imageBaseHeight,'bg1rocks_1');
       rocks1.setScale(heightRatio);
       rocks1.setDataEnabled();
       rocks1.data.set('scrollspeed', 0.4);
+
       const rocks2 = this.add.tileSprite(originX, topBackgroundOriginY, imageBaseWidth, imageBaseHeight, 'bg1rocks_2');
       rocks2.setScale(heightRatio);
       rocks2.setDataEnabled();
       rocks2.data.set('scrollspeed', 0.5);
       this.topGoalMountains = this.add.container(0, 100, [bg1, cloud1, cloud2, rocks1, rocks2]).setName('topGoal');
 
+      this.topGoalMountains.each( item => {
+        item.setPipeline('Light2D');
+        item.setDisplaySize(config.width, topBackgroundHeight);
+      });
+
+      this.lights.enable();
+      this.lights.setAmbientColor(0x808080);
+
+      const spotlight = this.lights.addLight(config.width/2, config.height/2, 60).setIntensity(4);
+
+      this.tweens.add({
+        targets: spotlight,
+        intensity: 2,
+        duration: 500,
+        ease: 'Sine.easeOut',
+        yoyo: true,
+        repeat: -1
+      })
+
       // bottom scene
       const bg2 = this.add.image(originX, bottomOriginY, 'bg4_sky').setDisplaySize(config.width, topBackgroundHeight);
-      bg2.flipY = true;
       bg2.setDataEnabled();
       bg2.data.set('scrollspeed', 0);
+
       const s2cloud1 = this.add.tileSprite(originX, bottomOriginY, imageBaseWidth, imageBaseHeight, 'bg4_clouds1');
       s2cloud1.setScale(heightRatio);
-      s2cloud1.flipY = true;
       s2cloud1.setDataEnabled();
       s2cloud1.data.set('scrollspeed', 0.09);
+      
+
       const s2cloud2 = this.add.tileSprite(originX, bottomOriginY, imageBaseWidth, imageBaseHeight, 'bg4_clouds2');
       s2cloud2.setScale(heightRatio);
-      s2cloud2.flipY = true;
       s2cloud2.setDataEnabled();
       s2cloud2.data.set('scrollspeed', 0.1);
+
       const s2rocks = this.add.tileSprite(originX, bottomOriginY, imageBaseWidth, imageBaseHeight, 'bg4_rocks');
       s2rocks.setScale(heightRatio);
-      s2rocks.flipY = true;
       s2rocks.setDataEnabled();
       s2rocks.data.set('scrollspeed', 0.4);
+
       const s2ground = this.add.tileSprite(originX, bottomOriginY, imageBaseWidth, imageBaseHeight, 'bg4_ground');
       s2ground.setScale(heightRatio);
-      s2ground.flipY = true;
       s2ground.setDataEnabled();
       s2ground.data.set('scrollspeed', 0.6);
 
@@ -96,6 +119,11 @@ export default class ParallaxScene extends BaseScene {
         s2ground
       ]).setName('bottomGoal');
 
+      this.bottomGoalMountains.each( item => {
+        item.flipY = true;
+        item.setDisplaySize(config.width, topBackgroundHeight);
+        item.setPipeline('Light2D');
+      })
 
       const topText = this.add.text(config.width/2 - 50, 20, "Toggle Top Scene").setInteractive();
       const bottomText = this.add.text(config.width/2 - 50, config.height - 20, "Toggle Bottom Scene").setInteractive();
@@ -108,6 +136,12 @@ export default class ParallaxScene extends BaseScene {
         this.playBottomScene = (this.playBottomScene) ? false : true;
       }, this)
 
+      this.input.on('pointermove', function(pointer) {
+        spotlight.x = pointer.x;
+        spotlight.y = pointer.y;
+      });
+
+
     }
 
 
@@ -115,7 +149,7 @@ export default class ParallaxScene extends BaseScene {
       if (this.playTopScene) {
         this.topGoalMountains?.each((item) => {
           const scrollSpeed = item.data.get('scrollspeed');
-          item.tilePositionX += scrollSpeed;
+          item.tilePositionX += scrollSpeed * 2;
         });
       } else {
         this.topGoalMountains?.each((item) => {
@@ -126,7 +160,7 @@ export default class ParallaxScene extends BaseScene {
       if (this.playBottomScene) {
         this.bottomGoalMountains?.each(item => {
           const scrollSpeed = item.data.get('scrollspeed');
-          item.tilePositionX -= scrollSpeed;
+          item.tilePositionX -= scrollSpeed * 2;
         }) 
       } else {
         this.bottomGoalMountains?.each(item => {

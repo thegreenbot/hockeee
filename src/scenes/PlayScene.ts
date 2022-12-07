@@ -38,18 +38,26 @@ export default class PlayScene extends BaseScene {
   }
 
   arrangeAmmo() {
-    this.players.map( (player, index) => {
-      let {x,y} = player.getStartVector();
+    this.players.map((player, index) => {
+      let { x, y } = player.getStartVector();
       const ammo = player.getAllAmmo();
-      ammo.map( item => {
-        item.setX(x);
-        item.setY(y);
+      ammo.map((item) => {
+        this.tweens.add({
+          targets: item,
+          x: x,
+          y: y,
+          duration: 250,
+          ease: "Sine.easeOut",
+          yoyo: false,
+          repeat: 0,
+        });
+
         if (index === 0 || index === 3) {
           x = x + 30;
         } else {
           x = x - 30;
         }
-      })
+      });
     });
   }
 
@@ -71,10 +79,9 @@ export default class PlayScene extends BaseScene {
         ball.setScale(0.5);
         ball.setStatic(true);
 
-        ball.setCollisionGroup(this.nonCollidingGroup);
+        ball.setCollisionGroup(this.nonCollidingGroup);       
         player.addAmmo(ball);
         this.ammo.push(ball);
-        
       }
     });
     this.arrangeAmmo();
@@ -90,11 +97,6 @@ export default class PlayScene extends BaseScene {
     animConf.forEach((anim) => {
       this.createAnim(anim.key, anim.start, anim.end);
     });
-  }
-
-  calculateScore() {
-    // should look at zones & balls
-    // match score to player
   }
 
   createPlayers() {
@@ -133,7 +135,7 @@ export default class PlayScene extends BaseScene {
       this.createSling();
     } else {
       // game over!
-      console.log('game over');
+      console.log("game over");
     }
   }
 
@@ -265,7 +267,9 @@ export default class PlayScene extends BaseScene {
     this.createAmmo(5);
     this.createInputs();
     createCollisionEvents([this.topGoal, this.bottomGoal], this.ammo, this);
-    this.startTurn(0);
+    setTimeout(() => {
+      this.startTurn(0);
+    }, 400);
 
     this.matter.world.setBounds();
     this.matter.add.mouseSpring();
@@ -274,50 +278,69 @@ export default class PlayScene extends BaseScene {
   cleanup(): void {
     const config = this.getConfig();
 
-    this.ammo.forEach((body) => {
-      if (body.gameObject) {
+    this.ammo.forEach((ammo) => {
+      if (ammo.body && !ammo.body.isStatic) {
+        const { position, gameObject } = ammo.body;
         // if body in top area
-        if (body.gameObject.y < 80) {
+        if (position.y < 80) {
           // is in p4 quadrant?
-          if (body.gameObject.x < config.width / 2) {
-            body.gameObject.setData("belongsTo", "player4");
-            this.players[3].addAmmo(body);
-            body.setCollisionGroup(this.nonCollidingGroup);
-            body.setScale(0.8);
-            body.setStatic(true);
+          if (position.x < config.width / 2) {
+            gameObject.setData("belongsTo", "player4");
+            this.players[3].addAmmo(ammo);
+            ammo.setCollisionGroup(this.nonCollidingGroup);
+            ammo.setScale(0.5);
+            this.input.setDraggable(ammo, false);
+            ammo.disableInteractive();
+            ammo.setStatic(true);
+            ammo.setFrame(36);
+            ammo.setAnimationName("player4");
           }
 
           // is in p2 quadrant?
-          if (body.gameObject.x > config.width / 2) {
-            body.gameObject.setData("belongsTo", "player2");
-            this.players[1].addAmmo(body);
-            body.setCollisionGroup(this.nonCollidingGroup);
-            body.setScale(0.8);
-            body.setStatic(true);
+          if (position.x > config.width / 2) {
+            gameObject.setData("belongsTo", "player2");
+            this.players[1].addAmmo(ammo);
+            ammo.setCollisionGroup(this.nonCollidingGroup);
+            ammo.setScale(0.5);
+            this.input.setDraggable(ammo, false);
+            ammo.disableInteractive();
+            ammo.setStatic(true);
+            ammo.setFrame(12);
+            ammo.setAnimationName("player2");
           }
         }
 
         // if body in bottom area
-        if (body.gameObject.y > config.height - 80) {
+        if (position.y > config.height - 80) {
           // is in p3 quadrant
-          if (body.gameObject.x > config.width / 2) {
-            body.gameObject.setData("belongsTo", "player3");
-            this.players[2].addAmmo(body);
-            body.setCollisionGroup(this.nonCollidingGroup);
-            body.setScale(0.8);
-            body.setStatic(true);
+          if (position.x > config.width / 2) {
+            gameObject.setData("belongsTo", "player3");
+            this.players[2].addAmmo(ammo);
+            ammo.setCollisionGroup(this.nonCollidingGroup);
+            ammo.setScale(0.5);
+            this.input.setDraggable(ammo, false);
+            ammo.disableInteractive();
+            ammo.setStatic(true);
+            ammo.setFrame(24);
+            ammo.setAnimationName("player3");
           }
           // is in p1 quadrant
-          if (body.gameObject.x < config.width / 2) {
-            body.gameObject.setData("belongsTo", "player1");
-            this.players[0].addAmmo(body);
-            body.setCollisionGroup(this.nonCollidingGroup);
-            body.setScale(0.8);
-            body.setStatic(true);
+          if (position.x < config.width / 2) {
+            gameObject.setData("belongsTo", "player1");
+            this.players[0].addAmmo(ammo);
+            ammo.setCollisionGroup(this.nonCollidingGroup);
+            ammo.setScale(0.5);
+            this.input.setDraggable(ammo, false);
+            ammo.disableInteractive();
+            ammo.setStatic(true);
+            ammo.setFrame(0);
+            ammo.setAnimationName("player1");
           }
         }
       }
     });
+
+    this.arrangeAmmo();
   }
 
   update(time: number, delta: number): void {
@@ -330,7 +353,10 @@ export default class PlayScene extends BaseScene {
       if (this.checkIfBallsHaveStopped()) {
         this.turnStarted = false;
         this.cleanup();
-        this.startTurn();
+
+        setTimeout(() => {
+          this.startTurn();
+        }, 100);
       }
     }
 

@@ -2,6 +2,7 @@ import Phaser from "phaser";
 
 export default class Ball extends Phaser.Physics.Matter.Sprite {
   public animationName: string;
+  public spotLight: Phaser.GameObjects.Light|null = null;
 
   constructor(
     scene: { matter: { world: Phaser.Physics.Matter.World } },
@@ -42,6 +43,25 @@ export default class Ball extends Phaser.Physics.Matter.Sprite {
     scene.add.existing(this);
   }
 
+  public spotlightColor() {
+    let color = '#ffffff';
+    switch(this.animationName) {
+      case 'player1':
+        color = '#E22016'
+        break;
+      case 'player2':
+        color = '#E6DF0C'
+        break;
+      case 'player3':
+        color = '#E60CE6';
+        break;
+      case 'player4':
+        color = '#0C2EE6';
+        break;
+    }
+    return color;
+  }
+
   public updateAnimation() {
     if (this.body.speed <= 0.1) {
       this.body.gameObject.anims.stop();
@@ -55,6 +75,26 @@ export default class Ball extends Phaser.Physics.Matter.Sprite {
           ) / 200
         ) * 10;
       this.body.gameObject.anims.play(this.animationName, speed);
+    }
+  }
+
+  public addSpotlight() {
+    const {x, y }= this.body.position;
+    this.spotLight = this.scene.lights.addLight(x, y, 60, this.spotlightColor(), 4);
+  }
+
+  public destroySpotlight() {
+    if (this.spotLight) {
+      this.scene.lights.removeLight(this.spotLight);
+      this.spotLight = null;
+    }
+  }
+
+  public setSpotlightPosition() {
+    if (this.spotLight) {
+      const {x, y}= this.body.position;
+      this.spotLight.x = x;
+      this.spotLight.y = y;
     }
   }
 
@@ -74,5 +114,9 @@ export default class Ball extends Phaser.Physics.Matter.Sprite {
 
   public setAdaptiveScale() {
     this.setScale(this.data.get("health") / 20);
+  }
+
+  public setAnimationName(newName: string): void {
+    this.animationName = newName;
   }
 }

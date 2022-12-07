@@ -22,8 +22,8 @@ const scale = mobileAndTabletCheck()
   : { autoCenter: Phaser.Scale.CENTER_BOTH };
 
 const SHARED_CONFIG = {
-  width: 600,
-  height: 800,
+  width: window ? window.innerWidth - 20 : 600,
+  height: window ? window.innerHeight - 20 : 800,
   maxVelocity: 50,
 };
 
