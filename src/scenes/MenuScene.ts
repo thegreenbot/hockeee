@@ -5,7 +5,8 @@ class MenuScene extends BaseScene {
     super('MenuScene', config);
     this.menu = [
       { scene: 'PlayScene', text: 'Play' },
-      { scene: 'DebugMenuScene', text: 'Debug'},
+      { scene: 'DebugMenuScene', text: 'Debug' },
+      { scene: null, text: 'Fullscreen' },
       { scene: null, text: 'Exit' }
     ]
   }
@@ -31,6 +32,13 @@ class MenuScene extends BaseScene {
       menuItem.scene && this.scene.start(menuItem.scene);
       if (menuItem.text === 'Exit') {
         this.game.destroy(true);
+      }
+      if (menuItem.text === 'Fullscreen') {
+        if (this.scale.isFullscreen) {
+          this.scale.stopFullscreen();
+        } else {
+          this.scale.startFullscreen();
+        }
       }
     })
   }

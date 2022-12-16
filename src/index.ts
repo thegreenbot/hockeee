@@ -16,9 +16,9 @@ import ParallaxScene from "./scenes/debug/ParallaxScene";
 
 const scale = mobileAndTabletCheck()
   ? {
-      mode: Phaser.Scale.FIT,
-      autoCenter: Phaser.Scale.CENTER_BOTH,
-    }
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+  }
   : { autoCenter: Phaser.Scale.CENTER_BOTH };
 
 const SHARED_CONFIG = {
@@ -66,16 +66,21 @@ const config: Phaser.Types.Core.GameConfig = {
   ...SHARED_CONFIG,
   parent: "game",
   type: Phaser.AUTO,
-  scale: scale,
+  scale: {
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+    width: SHARED_CONFIG.width,
+    height: SHARED_CONFIG.height
+  },
   physics: {
     default: 'matter',
     matter: {
-      debug: true,
+      debug: false,
       gravity: false,
       enableSleeping: true,
     },
     arcade: {
-      debug: true,
+      debug: false,
       gravity: {
         x: 0,
         y: 0,
