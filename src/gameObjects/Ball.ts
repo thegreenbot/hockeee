@@ -13,11 +13,11 @@ export default class Ball extends Phaser.Physics.Matter.Sprite {
     emitterColor: string,
     player: string
   ) {
-    const matterBodyConfig: Phaser.Types.Physics.Matter.MatterBodyConfig = {
-      restitution: 1,
-      circleRadius: 25,
-      density: 10,
-      frictionAir: 0.02,
+    const matterBodyConfig: Phaser.Types.Matter.MatterBodyConfig = {
+      restitution: 0.8,
+      circleRadius: 20,
+      density: 8,
+      frictionAir: 0.05,
     };
     super(scene.matter.world, x, y, "poke", frame, matterBodyConfig);
     this.setDataEnabled();

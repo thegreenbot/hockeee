@@ -381,6 +381,15 @@ export default class PlayScene extends BaseScene {
 
   update(time: number, delta: number): void {
     this.ammo.forEach((ball: Ball) => {
+      // Limit maximum velocity
+      if (ball.body.speed > 15) {
+        const velocity = ball.body.velocity;
+        const angle = Math.atan2(velocity.y, velocity.x);
+        ball.setVelocity(
+          Math.cos(angle) * 15,
+          Math.sin(angle) * 15
+        );
+      }
       ball.updateAnimation();
       ball.setSpotlightPosition();
     });
