@@ -7,7 +7,7 @@ export default class SlingScene extends BaseScene {
   public sling: MatterJS.ConstraintType | null = null;
   private players: Array<Player> = [];
   public turnStarted = false;
-  public activeTween: Phaser.Tweens.Tween|null = null;
+  public activeTween: Phaser.Tweens.Tween | null = null;
 
   private currentPlayer: number = 0;
 
@@ -44,7 +44,7 @@ export default class SlingScene extends BaseScene {
         );
         ball.setScale(0.5);
         ball.setStatic(true);
-        
+
         ball.setCollisionGroup(this.nonCollidingGroup);
         player.addAmmo(ball);
         this.ammo.push(ball);
@@ -67,8 +67,8 @@ export default class SlingScene extends BaseScene {
   }
 
   setCurrentPlayer() {
-     this.currentPlayer < 3 
-      ? this.currentPlayer++ 
+    this.currentPlayer < 3
+      ? this.currentPlayer++
       : this.currentPlayer = 0;
   }
 
@@ -85,16 +85,16 @@ export default class SlingScene extends BaseScene {
   }
 
   startTurn(player?: number) {
-      if (this.canPlay()) {
-        if (player || player === 0) {
-          this.currentPlayer = player;
-        } else {
-          this.setCurrentPlayer();
-        }
-        this.createSling();
+    if (this.canPlay()) {
+      if (player || player === 0) {
+        this.currentPlayer = player;
       } else {
-        // game over!
+        this.setCurrentPlayer();
       }
+      this.createSling();
+    } else {
+      // game over!
+    }
   }
 
   createSling() {
@@ -139,7 +139,7 @@ export default class SlingScene extends BaseScene {
           ball.body.ignorePointer = true;
           this.matter.world.remove(this.sling);
           this.tweens.remove(this.activeTween);
-          
+
         }, 20);
       }, this
     );
@@ -171,16 +171,16 @@ export default class SlingScene extends BaseScene {
   }
 
   update(time: number, delta: number): void {
-    
+
     this.ammo.forEach((ball: Ball) => {
       ball.updateAnimation();
     });
 
     if (this.turnStarted) {
-    if (this.checkIfBallsHaveStopped()) {
-      this.turnStarted = false;
-      this.startTurn();
-    }
+      if (this.checkIfBallsHaveStopped()) {
+        this.turnStarted = false;
+        this.startTurn();
+      }
     }
   }
 }
